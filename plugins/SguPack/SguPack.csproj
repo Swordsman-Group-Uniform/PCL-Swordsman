@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!--
+        SGU 插件包：向宿主提供「非蓝色扩展主题」与「回声洞语录」。
+        契约程序集由宿主提供，插件不复制 PCL.PluginSdk.dll（否则类型身份分裂）。
+    -->
+    <PropertyGroup>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
+        <LangVersion>14</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AssemblyName>SguPack</AssemblyName>
+        <RootNamespace>SguPack</RootNamespace>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU;x64;ARM64</Platforms>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\PCL.PluginSdk\PCL.PluginSdk.csproj">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="plugin.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+</Project>

@@ -1,0 +1,108 @@
+PCLCE For SGU —— 交接包内容说明
+==================================================
+
+交接日期：2026-10-25
+版本：27.1-snapshot-27(2.15.1)   内部代号：550
+上游代码基点：PCL CE dev @ d1149d5（2026-10-24）
+
+先读这三份
+----------
+1. README-FIRST.md          一页导览：这是什么、按什么顺序读、哪些东西不能碰、排障索引
+2. HANDOFF-2026-10-25.md    给下一位维护者的交接书：现状、验证到哪一步、下一步做什么、
+                            未完成清单、踩坑大全、需要拍板的事项
+3. HANDOVER.md              最全的常驻文档（900+ 行）：项目全景、构建发版、上游同步、
+                            下游改动索引、插件系统、约定与踩坑（按快照记录历史）
+
+之后按需
+--------
+DOWNSTREAM-CHANGES.md       逐版改动记录（"为什么这么写"）
+VERSIONING.md               版本号规范（括号外=下游，括号内=上游；注意 upstream 字段的双重含义）
+docs/DOWNLOAD-LIMIT.md      下载页关闭机制 + 「下载限制解除」插件原理
+docs/PLUGIN-API.md          插件接口参考
+docs/PLUGIN-GUIDE.md        插件制作指南
+docs/PLUGIN-SYSTEM.md       插件系统设计（M0-M1 已实现，M2-M5 待做）
+docs/FIRST-RUN-DIALOGS.md   首次启动各弹窗的文案与复现方法
+docs/MICROSOFT-OAUTH-SETUP.md  微软登录（OAuth）配置说明
+samples/README.md           示例插件的编译/打包/安装方法
+
+包含的内容
+----------
+Plain Craft Launcher 2/     WPF 启动器主程序（上游 + 下游改动）
+PCL.Core/                   核心库
+PCL.PluginSdk/              插件契约（接口 / DTO / 能力枚举 / 功能键）
+PCL.PluginHost/             插件加载器 / 包模型 / 安装卸载 / 状态存储
+PCL.Core.SourceGenerators/  源生成器
+PCL.Core.Test/              核心库测试工程
+plugins/                    插件源码（SguPack / UnlockLimits / DownloadUnlock）+ package.ps1|sh + dist/
+samples/HelloPlugin/        示例插件源码
+tools/build.ps1             Windows 构建入口（等价 build.sh，须保持 UTF-8 with BOM）
+build.sh                    构建入口（需要 bash + python3）
+.github/                    GitHub Actions 工作流（上游模板，未针对本分支改造）
+docs/                       设计文档（docs/archive/ 是旧交接文档与历史启动日志）
+dist/                       已构建产物：见下
+Plain Craft Launcher 2.slnx 解决方案
+PCLCE For SGU 27.1-snapshot-27(2.15.1).lnk   指向 dist 里 exe 的快捷方式
+LICENSE / README*.md / CONTRIBUTING.md / cliff.toml / .editorconfig / .gitattributes / .gitignore
+swordsman.png               本分支品牌素材
+
+dist/ 里有什么
+--------------
+PCLCE For SGU 27.1-snapshot-27(2.15.1).exe
+    当前标准产物。23,851,112 B
+    SHA-256 F118D47F1B61DB22054A21C8C2770C10BF25627F43DC766BDA943916DEC6C4D6
+    框架依赖单文件（运行需 .NET 10 桌面运行时），非正式版内嵌三个插件包
+SguPack.pclpkg / UnlockLimits.pclpkg / HelloPlugin.pclpkg
+    随包插件（非正式版会内嵌并首次启动自动安装）
+DownloadUnlock.pclpkg
+    「下载限制解除」插件。刻意只放在 dist/（不进 plugins/dist/），不随包自动安装
+hello-1.0.0.pclpkg
+    示例插件包（等同 HelloPlugin.pclpkg 的历史文件名）
+dist/plugins/               上面几个插件包的副本（与 dist/ 根目录同一份内容）
+
+刻意排除的内容（不要以为丢了）
+------------------------------
+_archive/           旧工作区、离线 NuGet feed（215 个 nupkg）、离线 .NET SDK 10.0.402，合计 1 GB+
+_backup/            历史构建备份（含 snapshot-24 的 exe 与源码快照）
+_tmp/               临时探针工程（verify-exe / make-lnk / probe-lang / probe-download-unlock 等）
+artifact-*/         构建输出目录，重新构建会生成
+PCL-2.99.0.0/       上游参考仓库副本（292 文件，含另一个 PCL 的 exe），与构建无关；去留待拍板
+HMCL-main/          GPLv3 参考源码 —— 只许阅读，严禁拷贝任何代码/资源进本仓库
+bin/ obj/ .vs/ *.user *.pdb     编译中间产物
+.appdata/ .localappdata/ .nuget/ .dotnet-home/ .dotnet-cli-home/ .build-tmp/ .temp/
+                    本机构建环境（不是项目内容）
+LastPending.log     某次实机崩溃的残留日志
+dist/ 里的旧快照 exe（snapshot-19 ~ snapshot-26）  只保留最新一份
+
+如何构建
+--------
+Windows（推荐，无需 bash/python3）：
+
+    powershell -ExecutionPolicy Bypass -File tools\build.ps1
+    powershell -ExecutionPolicy Bypass -File tools\build.ps1 -Platform ARM64
+    powershell -ExecutionPolicy Bypass -File tools\build.ps1 -Configuration Debug
+
+    产物：artifact-<平台>\PCLCE For SGU <版本>.exe，并自动同步一份到 dist\
+
+拿不到网络时（离线还原）：
+
+    powershell -ExecutionPolicy Bypass -File tools\build.ps1 -RestoreSources <本地 nupkg 目录>
+
+前置条件：.NET SDK 10（可用 `dotnet --list-sdks` 确认）；
+构建脚本会先校验本地化 XAML 无重复键，再打包插件，最后 publish。
+
+发版
+----
+1. 改 Plain Craft Launcher 2\metadata.json 的 version.suffix 与 version.code（正式版把 suffix 置空）
+2. 在 DOWNSTREAM-CHANGES.md 加小节（版本号 / 产物大小 / SHA-256）
+3. 在 HANDOVER.md §0 加修订小节、更新 §2 状态表
+4. 构建 → 抽查产物字符串 → 更新根目录快捷方式 → 重新打交接包
+
+交接注意事项
+------------
+* 单实例互斥：启动器在跑时新进程会直接退出，因此界面改动无法自动化验证，必须人工点一遍。
+* tools/build.ps1 与 plugins/package.ps1 必须保持 UTF-8 with BOM（否则被 PS 5.1 按 GBK 解码而解析失败）。
+* 语言文件（PCL.Core/App/Localization/Languages/*.xaml）里出现重复 x:Key 会让界面所有文字变空，
+  构建已加门禁；手工改完记得跑一次构建确认打印「本地化键校验通过」。
+* snapshot-26 有「界面文字全空」的缺陷，已被 snapshot-27 取代，历史 exe 不要分发。
+* 当前 GUI 观感、陶瓦联机均未实测 —— 这是接手后最该补的两块。
+* 详细待办与待拍板事项见 HANDOFF-2026-10-25.md §3 / §4 / §8。

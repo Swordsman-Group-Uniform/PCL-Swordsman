@@ -1,0 +1,24 @@
+{
+  "id": "pcls.core",
+  "name": "PCLS 核心插件",
+  "version": "1.1.1",
+  "apiVersion": 1,
+  "minHostVersion": "27.1.0",
+  "author": "剑客群组服服主团队",
+  "description": "解除下载页的中国大陆地区屏蔽（恢复 Minecraft 下载服务），以及「必须先绑定正版账号才能创建离线 / 外置档案」的限制。",
+  "entry": {
+    "assembly": "PCLSCore.dll",
+    "type": "PCLSCore.PCLSCorePlugin"
+  },
+  "capabilities": [
+    "config"
+  ],
+  "provides": [
+    "unlock.region",
+    "unlock.offline-auth"
+  ],
+  "ui": {
+    "icon": "lucide/shield-check",
+    "sortOrder": 20
+  }
+}

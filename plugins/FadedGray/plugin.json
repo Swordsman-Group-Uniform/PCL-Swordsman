@@ -1,0 +1,13 @@
+{
+  "id": "sgu.faded-gray",
+  "name": "Faded灰主题",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "minHostVersion": "27.1.0",
+  "author": "剑客群组服服主团队",
+  "description": "自带主题「Faded灰」（#5C5C5C）：标题栏右上角附带一张低透明度、左右两侧虚化的 Faded.jpg。主题完全由本插件提供，不占宿主内置主题槽位。",
+  "entry": { "assembly": "FadedGray.dll", "type": "FadedGray.FadedGrayThemePlugin" },
+  "capabilities": ["config", "themes.custom"],
+  "provides": [],
+  "ui": { "icon": "lucide/palette", "sortOrder": 20 }
+}

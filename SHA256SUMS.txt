@@ -1,0 +1,25 @@
+PCLCE For SGU — handover package checksums
+==========================================
+Generated: 2026-10-25
+Version  : 27.1-snapshot-27(2.15.1)  code 550
+
+File: PCLCE-For-SGU_handover_20261025.zip
+  size   : 16,016,339 bytes (15.27 MB)
+  entries: 1190 files, root folder "PCLCE For SGU/", forward-slash separators
+  sha256 : 2C73ECD54D82B8A52C0BCD1B5A040E678E08C1B4419D7E2FD8BDA93448BFD335
+
+Inside, the build artifact:
+  dist/PCLCE For SGU 27.1-snapshot-27(2.15.1).exe
+  size   : 23,851,112 bytes
+  sha256 : F118D47F1B61DB22054A21C8C2770C10BF25627F43DC766BDA943916DEC6C4D6
+
+Plugins bundled in the package (source + built package):
+  plugins/dist/HelloPlugin.pclpkg    2622 B
+  plugins/dist/SguPack.pclpkg        4586 B
+  plugins/dist/UnlockLimits.pclpkg   2307 B
+  dist/DownloadUnlock.pclpkg         3186 B   (sgu.download-unlock, NOT auto-installed)
+  plugins/DownloadUnlock/            source: plugin.json + DownloadUnlockPlugin.cs + csproj
+
+Verify with:
+  Windows : Get-FileHash .\PCLCE-For-SGU_handover_20261025.zip -Algorithm SHA256
+  Linux   : sha256sum PCLCE-For-SGU_handover_20261025.zip

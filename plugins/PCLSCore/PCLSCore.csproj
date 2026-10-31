@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!--
+        PCLS 核心插件：声明功能键（unlock.region / unlock.offline-auth），
+        真正的判定与放行逻辑在宿主里，插件不携带任何行为代码。
+    -->
+    <PropertyGroup>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
+        <LangVersion>14</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AssemblyName>PCLSCore</AssemblyName>
+        <RootNamespace>PCLSCore</RootNamespace>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU;x64;ARM64</Platforms>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\PCL.PluginSdk\PCL.PluginSdk.csproj">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="plugin.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+</Project>

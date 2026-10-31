@@ -1,0 +1,48 @@
+<Grid x:Class="PCL.MyPluginItem"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="clr-namespace:PCL"
+      xmlns:svgIcon="clr-namespace:PCL.Core.UI.Controls.SvgIcon;assembly=PCL.Core"
+      Height="44" Background="{StaticResource ColorBrushSemiTransparent}"
+      SnapsToDevicePixels="True" UseLayoutRounding="True" Cursor="Hand">
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="6" />
+        <ColumnDefinition Width="34" />
+        <ColumnDefinition Width="7" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="1*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="4" />
+    </Grid.ColumnDefinitions>
+
+    <!-- 左侧色条：可用为强调色，禁用/出错为灰 -->
+    <Border x:Name="BarAccent" Grid.Column="0" Background="{DynamicResource ColorBrush3}" />
+
+    <!-- 图标 -->
+    <Border Grid.Column="1" Width="34" Height="34" CornerRadius="6" Background="{DynamicResource ColorBrush6}"
+            HorizontalAlignment="Right" VerticalAlignment="Center">
+        <svgIcon:SvgIcon x:Name="ImgIcon" Width="18" Height="18" Icon="lucide/puzzle"
+                         IconBrush="{DynamicResource ColorBrush3}" />
+    </Border>
+
+    <!-- 标题 + 副信息 -->
+    <StackPanel Grid.Column="3" Grid.ColumnSpan="2" Margin="0,0,10,0" VerticalAlignment="Center">
+        <TextBlock x:Name="LabTitle" FontSize="14" TextTrimming="CharacterEllipsis" />
+        <TextBlock x:Name="LabInfo" Margin="0,1,0,0" FontSize="12"
+                   Foreground="{DynamicResource ColorBrushGray3}" TextTrimming="CharacterEllipsis" />
+    </StackPanel>
+
+    <!-- 右侧操作 -->
+    <StackPanel Grid.Column="5" Margin="0,0,8,0" Orientation="Horizontal" VerticalAlignment="Center">
+        <local:MyIconButton x:Name="BtnUpdate" Width="26" Height="26" Margin="0,0,6,0"
+                            LogoScale="0.85" Theme="Black" Visibility="Collapsed"
+                            SvgIcon="lucide/refresh-cw" Click="BtnUpdate_Click" />
+        <local:MyIconButton x:Name="BtnSettings" Width="26" Height="26" Margin="0,0,6,0"
+                            LogoScale="0.85" Theme="Black" Visibility="Collapsed"
+                            SvgIcon="lucide/settings" Click="BtnSettings_Click" />
+        <local:MyIconButton x:Name="BtnToggle" Width="26" Height="26" Margin="0,0,6,0"
+                            LogoScale="0.85" Theme="Black" Click="BtnToggle_Click" />
+        <local:MyIconButton x:Name="BtnFolder" Width="26" Height="26" LogoScale="0.85" Theme="Black"
+                            SvgIcon="lucide/folder-open" Click="BtnFolder_Click" />
+    </StackPanel>
+</Grid>

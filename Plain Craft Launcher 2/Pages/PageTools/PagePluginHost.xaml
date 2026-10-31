@@ -1,0 +1,36 @@
+<local:MyPageRight x:Class="PCL.PagePluginHost"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:local="clr-namespace:PCL"
+                   PanScroll="{Binding ElementName=PanBack}">
+    <Grid>
+        <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                              x:Name="PanBack">
+            <StackPanel x:Name="PanMain" Margin="25,10,25,10" Grid.IsSharedSizeScope="True">
+                <!-- 页面头：标题 / 说明 / 来源插件 -->
+                <local:MyCard x:Name="PanHeader" Margin="0,15,0,15">
+                    <StackPanel Margin="20,16,18,18">
+                        <TextBlock x:Name="TxtTitle" FontSize="16" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+                        <TextBlock x:Name="TxtDescription" Margin="0,6,0,0" FontSize="12" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource ColorBrushGray3}" />
+                        <TextBlock x:Name="TxtSource" Margin="0,6,0,0" FontSize="12" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource ColorBrushGray3}" />
+                    </StackPanel>
+                </local:MyCard>
+
+                <!-- 插件自己给的控件放在这里 -->
+                <ContentPresenter x:Name="PanContent" />
+
+                <!-- 出错时的兜底 -->
+                <local:MyCard x:Name="PanError" Margin="0,0,0,15" Visibility="Collapsed">
+                    <StackPanel Margin="20,16,18,18">
+                        <TextBlock Text="{DynamicResource Tools.Plugin.Page.Error}" FontSize="13" FontWeight="Bold"
+                                   TextWrapping="Wrap" />
+                        <TextBlock x:Name="TxtError" Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource ColorBrushGray3}" />
+                    </StackPanel>
+                </local:MyCard>
+            </StackPanel>
+        </local:MyScrollViewer>
+    </Grid>
+</local:MyPageRight>

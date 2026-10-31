@@ -1,0 +1,136 @@
+<local:MyPageRight x:Class="PCL.PageToolsPluginManage"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:local="clr-namespace:PCL"
+                   PanScroll="{Binding ElementName=PanBack}">
+    <Grid>
+        <Grid x:Name="PanAllBack">
+            <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  x:Name="PanBack">
+                <StackPanel x:Name="PanMain" Margin="25,10,25,10" Grid.IsSharedSizeScope="True">
+                    <local:MySearchBox Margin="0,15" HintText="{DynamicResource Tools.Plugin.Search.Hint}" x:Name="SearchBox" />
+
+                    <!-- 操作栏（与「实例设置 → 模组」一致） -->
+                    <local:MyCard Margin="0,0,0,15" x:Name="PanManage">
+                        <WrapPanel Margin="15,8,0,15">
+                            <local:MyButton x:Name="BtnManageOpen" MinWidth="110" Padding="13,7"
+                                            Text="{DynamicResource Tools.Plugin.Manage.OpenFolder}"
+                                            Margin="0,7,15,0" HorizontalAlignment="Left" ColorType="Highlight"
+                                            Click="BtnManageOpen_Click" />
+                            <local:MyButton x:Name="BtnManageInstall" MinWidth="110" Padding="13,7"
+                                            Text="{DynamicResource Tools.Plugin.Manage.Install}"
+                                            Margin="0,7,15,0" HorizontalAlignment="Left"
+                                            Click="BtnManageInstall_Click" />
+                            <local:MyButton x:Name="BtnManageDownload" MinWidth="110" Padding="13,7"
+                                            Text="{DynamicResource Tools.Plugin.Manage.Download}"
+                                            Margin="0,7,15,0" HorizontalAlignment="Left"
+                                            Click="BtnManageDownload_Click" />
+                            <local:MyButton x:Name="BtnManageSelectAll" MinWidth="110" Padding="13,7"
+                                            Text="{DynamicResource Tools.Plugin.Manage.SelectAll}"
+                                            Margin="0,7,15,0" HorizontalAlignment="Left"
+                                            Click="BtnManageSelectAll_Click" />
+                            <local:MyButton x:Name="BtnManageRescan" MinWidth="110" Padding="13,7"
+                                            Text="{DynamicResource Tools.Plugin.Manage.Rescan}"
+                                            Margin="0,7,15,0" HorizontalAlignment="Left"
+                                            Click="BtnManageRescan_Click" />
+                        </WrapPanel>
+                    </local:MyCard>
+
+                    <!-- 列表 -->
+                    <local:MyCard x:Name="PanListBack" VerticalAlignment="Top" Margin="0,0,0,14" Title=" "
+                                  MinHeight="55">
+                        <StackPanel x:Name="PanFilter" Margin="15,13,0,0" Orientation="Horizontal"
+                                    VerticalAlignment="Top" HorizontalAlignment="Left" Height="28">
+                            <local:MyRadioButton Tag="0" ColorType="Highlight" VerticalAlignment="Center" Margin="2,0"
+                                                 Text="{DynamicResource Tools.Plugin.Filter.All}" x:Name="BtnFilterAll"
+                                                 Checked="True" Check="Filter_Check" />
+                            <local:MyRadioButton Tag="1" ColorType="Highlight" VerticalAlignment="Center" Margin="2,0"
+                                                 Text="{DynamicResource Tools.Plugin.Filter.Enabled}" x:Name="BtnFilterEnabled"
+                                                 Check="Filter_Check" />
+                            <local:MyRadioButton Tag="2" ColorType="Highlight" VerticalAlignment="Center" Margin="2,0"
+                                                 Text="{DynamicResource Tools.Plugin.Filter.Disabled}" x:Name="BtnFilterDisabled"
+                                                 Check="Filter_Check" />
+                            <local:MyRadioButton Tag="3" ColorType="Highlight" VerticalAlignment="Center" Margin="2,0"
+                                                 Text="{DynamicResource Tools.Plugin.Filter.Error}" x:Name="BtnFilterError"
+                                                 Check="Filter_Check" />
+                        </StackPanel>
+                        <StackPanel Margin="0,13,15,0" Orientation="Horizontal" VerticalAlignment="Top"
+                                    HorizontalAlignment="Right" Height="28">
+                            <local:MyIconTextButton x:Name="BtnSort"
+                                                    Text="{DynamicResource Tools.Plugin.Sort.NameAsc}"
+                                                    SvgIcon="lucide/arrow-up-down" Click="BtnSort_Click" />
+                        </StackPanel>
+                        <StackPanel Margin="20,48,18,22" Name="PanList" VerticalAlignment="Top" />
+                    </local:MyCard>
+
+                    <!-- 插件设置：点列表项右边的齿轮后在这里展开（控件由代码按插件声明的 schema 生成） -->
+                    <local:MyCard x:Name="PanPluginSettings" Margin="0,0,0,14" Visibility="Collapsed">
+                        <StackPanel Margin="20,16,18,18">
+                            <Grid>
+                                <TextBlock x:Name="TxtSettingsTitle" FontSize="14" FontWeight="Bold"
+                                           VerticalAlignment="Center" HorizontalAlignment="Left"
+                                           TextTrimming="CharacterEllipsis" Margin="0,0,80,0" />
+                                <local:MyButton x:Name="BtnSettingsClose" MinWidth="70" Padding="10,5"
+                                                HorizontalAlignment="Right" Text="{DynamicResource Tools.Plugin.Settings.Close}"
+                                                Click="BtnSettingsClose_Click" />
+                            </Grid>
+                            <TextBlock x:Name="TxtSettingsEmpty" Margin="0,12,0,0" FontSize="12"
+                                       Foreground="{DynamicResource ColorBrushGray3}" TextWrapping="Wrap"
+                                       Visibility="Collapsed"
+                                       Text="{DynamicResource Tools.Plugin.Settings.Empty}" />
+                            <StackPanel x:Name="PanSettingsRows" Margin="0,14,0,0" />
+                        </StackPanel>
+                    </local:MyCard>
+                </StackPanel>
+            </local:MyScrollViewer>
+
+            <!-- 空状态 -->
+            <local:MyCard HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40" x:Name="PanEmpty"
+                          Visibility="Collapsed">
+                <StackPanel Margin="20,17">
+                    <TextBlock x:Name="TxtEmptyTitle" Margin="0,0,0,9" HorizontalAlignment="Center"
+                               Text="{DynamicResource Tools.Plugin.Manage.Empty.Title}"
+                               FontSize="19" UseLayoutRounding="True" SnapsToDevicePixels="True"
+                               Foreground="{DynamicResource ColorBrush3}" />
+                    <Rectangle HorizontalAlignment="Stretch" Height="2" Fill="{DynamicResource ColorBrush3}" />
+                    <TextBlock x:Name="TxtEmptyDescription" Margin="10,10,10,0"
+                               Text="{DynamicResource Tools.Plugin.Manage.Empty.Description}" TextWrapping="Wrap" />
+                    <WrapPanel Margin="10,20,10,5" HorizontalAlignment="Center" Orientation="Horizontal">
+                        <local:MyButton Height="35" x:Name="BtnHintInstall" MinWidth="130"
+                                        Text="{DynamicResource Tools.Plugin.Manage.Install}" Margin="5,0"
+                                        Padding="12,0" ColorType="Highlight" Click="BtnManageInstall_Click" />
+                        <local:MyButton Height="35" x:Name="BtnHintDownload" MinWidth="130"
+                                        Text="{DynamicResource Tools.Plugin.Manage.Download}" Margin="5,0"
+                                        Padding="12,0" Click="BtnManageDownload_Click" />
+                        <local:MyButton Height="35" x:Name="BtnHintOpen" MinWidth="130"
+                                        Text="{DynamicResource Tools.Plugin.Manage.OpenFolder}" Margin="5,0"
+                                        Padding="12,0" Click="BtnManageOpen_Click" />
+                        <local:MyButton Height="35" x:Name="BtnHintRescan" MinWidth="130"
+                                        Text="{DynamicResource Tools.Plugin.Manage.Rescan}" Margin="5,0"
+                                        Padding="12,0" Click="BtnManageRescan_Click" />
+                    </WrapPanel>
+                </StackPanel>
+            </local:MyCard>
+        </Grid>
+
+        <!-- 底部多选操作栏（与模组页一致） -->
+        <local:MyCard x:Name="CardSelect" Visibility="Collapsed" Opacity="0"
+                      HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="25,25,25,0" UseAnimation="False">
+            <local:MyCard.RenderTransform>
+                <TranslateTransform x:Name="TransSelect" Y="-10" />
+            </local:MyCard.RenderTransform>
+            <TextBlock x:Name="LabSelect" Text="" HorizontalAlignment="Center" VerticalAlignment="Top"
+                       Margin="9" Foreground="{DynamicResource ColorBrush2}" />
+            <StackPanel Orientation="Horizontal" Margin="5,28,5,5">
+                <local:MyIconTextButton x:Name="BtnSelectEnable" Text="{DynamicResource Tools.Plugin.Action.Enable}"
+                                        LogoScale="1.05" SvgIcon="lucide/circle-check" Click="BtnSelectEnable_Click" />
+                <local:MyIconTextButton x:Name="BtnSelectDisable" Text="{DynamicResource Tools.Plugin.Action.Disable}"
+                                        LogoScale="1" SvgIcon="lucide/circle-minus" Click="BtnSelectDisable_Click" />
+                <local:MyIconTextButton x:Name="BtnSelectDelete" Text="{DynamicResource Tools.Plugin.Action.Delete}"
+                                        LogoScale="1" SvgIcon="lucide/trash-2" Click="BtnSelectDelete_Click" />
+                <local:MyIconTextButton x:Name="BtnSelectCancel" Text="{DynamicResource Tools.Plugin.Action.CancelSelect}"
+                                        LogoScale="0.8" SvgIcon="lucide/x" Click="BtnSelectCancel_Click" />
+            </StackPanel>
+        </local:MyCard>
+    </Grid>
+</local:MyPageRight>

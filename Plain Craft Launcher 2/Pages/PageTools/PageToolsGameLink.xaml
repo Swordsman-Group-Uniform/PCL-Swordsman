@@ -1,0 +1,232 @@
+<local:MyPageRight x:Class="PCL.PageToolsGameLink"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:local="clr-namespace:PCL"
+                   PanScroll="{Binding ElementName=PanBack}">
+  <Grid>
+    <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" x:Name="PanBack">
+        <StackPanel x:Name="PanMain" Margin="25,10" Grid.IsSharedSizeScope="True">
+            <local:MyHint x:Name="HintTerraCotta" Margin="10,5,10,10" Theme="Blue"
+                          Text="{DynamicResource Tools.GameLink.TerraCotta.Hint}" />
+
+            <!-- 总开关 -->
+            <local:MyCard Margin="0,5,0,15" Title="{DynamicResource Tools.GameLink.TerraCotta.Switch.Title}">
+                <StackPanel Margin="25,40,25,20">
+                    <local:MyCheckBox x:Name="CheckTerraCotta" Height="22"
+                                      Text="{DynamicResource Tools.GameLink.TerraCotta.Switch.Enable}"
+                                      Change="CheckTerraCotta_Change" />
+                    <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Opacity="0.65" FontSize="12.5"
+                               Text="{DynamicResource Tools.GameLink.TerraCotta.Switch.Description}" />
+                    <Grid Margin="0,14,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                   Text="{DynamicResource Tools.GameLink.TerraCotta.Switch.Core}" Margin="0,0,12,0" />
+                        <TextBlock Grid.Column="1" x:Name="LabEasyTierStatus" VerticalAlignment="Center"
+                                   Opacity="0.7" FontSize="12.5" TextWrapping="Wrap" />
+                        <local:MyButton Grid.Column="2" x:Name="BtnDownloadEasyTier" MinWidth="130" Height="30"
+                                        Text="{DynamicResource Tools.GameLink.TerraCotta.Switch.Download}"
+                                        Click="BtnDownloadEasyTier_Click" />
+                    </Grid>
+                </StackPanel>
+            </local:MyCard>
+
+            <!-- 配置 -->
+            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource Tools.GameLink.TerraCotta.Settings.Title}">
+                <StackPanel x:Name="PanSettings" Margin="25,40,25,20">
+                    <Grid Height="28">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="LinkName" />
+                            <ColumnDefinition Width="200" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                   Text="{DynamicResource Tools.GameLink.TerraCotta.Settings.Username}" Margin="0,0,12,0" />
+                        <local:MyTextBox Grid.Column="1" x:Name="TextUserName" Height="28" MaxLength="16"
+                                         TextChanged="TextUserName_TextChanged"
+                                         ToolTip="{DynamicResource Tools.GameLink.TerraCotta.Settings.Username.ToolTip}" />
+                        <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.55"
+                                   FontSize="12" Text="{DynamicResource Tools.GameLink.TerraCotta.Settings.Username.Hint}" />
+                    </Grid>
+                    <Grid Height="28" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="LinkName" />
+                            <ColumnDefinition Width="200" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                   Text="{DynamicResource Tools.GameLink.TerraCotta.Settings.Relay}" Margin="0,0,12,0" />
+                        <local:MyComboBox Grid.Column="1" x:Name="ComboRelayMode" Height="28"
+                                          SelectionChanged="ComboRelayMode_SelectionChanged">
+                            <local:MyComboBoxItem Content="{DynamicResource Tools.GameLink.TerraCotta.Settings.Relay.Public}"
+                                                  ToolTip="{DynamicResource Tools.GameLink.TerraCotta.Settings.Relay.Public.ToolTip}" />
+                            <local:MyComboBoxItem Content="{DynamicResource Tools.GameLink.TerraCotta.Settings.Relay.P2POnly}"
+                                                  ToolTip="{DynamicResource Tools.GameLink.TerraCotta.Settings.Relay.P2POnly.ToolTip}" />
+                        </local:MyComboBox>
+                        <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.55"
+                                   FontSize="12" Text="{DynamicResource Tools.GameLink.TerraCotta.Settings.Relay.Hint}" />
+                    </Grid>
+                </StackPanel>
+            </local:MyCard>
+
+            <!-- 房主 -->
+            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource Tools.GameLink.TerraCotta.Host.Title}">
+                <StackPanel x:Name="PanHost" Margin="25,40,25,20">
+                    <TextBlock TextWrapping="Wrap" Opacity="0.7" FontSize="12.5"
+                               Text="{DynamicResource Tools.GameLink.TerraCotta.Host.Description}" />
+                    <Grid Margin="0,12,0,0" Height="28">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="LinkName" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                   Text="{DynamicResource Tools.GameLink.TerraCotta.Host.World}" Margin="0,0,12,0" />
+                        <local:MyComboBox Grid.Column="1" x:Name="ComboWorldList" Height="28" />
+                        <local:MyButton Grid.Column="2" x:Name="BtnRefreshWorld" MinWidth="90" Height="28" Margin="10,0,0,0"
+                                        Text="{DynamicResource Tools.GameLink.TerraCotta.Host.Refresh}"
+                                        Click="BtnRefreshWorld_Click" />
+                        <local:MyButton Grid.Column="3" x:Name="BtnInputPort" MinWidth="110" Height="28" Margin="10,0,0,0"
+                                        Text="{DynamicResource Tools.GameLink.TerraCotta.Host.InputPort}"
+                                        Click="BtnInputPort_Click" />
+                    </Grid>
+                    <local:MyButton x:Name="BtnCreate" MinWidth="160" Height="34" Margin="0,14,0,0"
+                                    HorizontalAlignment="Left" ColorType="Highlight"
+                                    Text="{DynamicResource Tools.GameLink.TerraCotta.Host.Create}"
+                                    Click="BtnCreate_Click" />
+                </StackPanel>
+            </local:MyCard>
+
+            <!-- 房客 -->
+            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource Tools.GameLink.TerraCotta.Guest.Title}">
+                <StackPanel x:Name="PanGuest" Margin="25,40,25,20">
+                    <TextBlock TextWrapping="Wrap" Opacity="0.7" FontSize="12.5"
+                               Text="{DynamicResource Tools.GameLink.TerraCotta.Guest.Description}" />
+                    <Grid Margin="0,12,0,0" Height="28">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="LinkName" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                   Text="{DynamicResource Tools.GameLink.TerraCotta.Guest.Code}" Margin="0,0,12,0" />
+                        <local:MyTextBox Grid.Column="1" x:Name="TextJoinCode" Height="28" MaxLength="32"
+                                         ToolTip="{DynamicResource Tools.GameLink.TerraCotta.Guest.Code.ToolTip}"
+                                         KeyDown="TextJoinCode_KeyDown" />
+                        <local:MyButton Grid.Column="2" x:Name="BtnJoin" MinWidth="130" Height="28" Margin="10,0,0,0"
+                                        ColorType="Highlight"
+                                        Text="{DynamicResource Tools.GameLink.TerraCotta.Guest.Join}"
+                                        Click="BtnJoin_Click" />
+                    </Grid>
+                </StackPanel>
+            </local:MyCard>
+
+            <!-- 当前连接 -->
+            <local:MyCard x:Name="CardConnection" Margin="0,0,0,15" Visibility="Collapsed"
+                          Title="{DynamicResource Tools.GameLink.TerraCotta.Connection.Title}">
+                <StackPanel Margin="25,40,25,20">
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="LinkName" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                   Text="{DynamicResource Tools.GameLink.TerraCotta.Connection.Code}" Margin="0,0,12,0" />
+                        <TextBlock Grid.Column="1" x:Name="LabRoomCode" VerticalAlignment="Center" FontSize="15"
+                                   FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+                        <local:MyButton Grid.Column="2" x:Name="BtnCopyCode" MinWidth="110" Height="28" Margin="10,0,0,0"
+                                        Text="{DynamicResource Tools.GameLink.TerraCotta.Connection.CopyCode}"
+                                        Click="BtnCopyCode_Click" />
+                        <local:MyButton Grid.Column="3" x:Name="BtnLeave" MinWidth="110" Height="28" Margin="10,0,0,0"
+                                        Text="{DynamicResource Tools.GameLink.TerraCotta.Connection.Leave}"
+                                        Click="BtnLeave_Click" />
+                    </Grid>
+                    <TextBlock x:Name="LabConnectionInfo" TextWrapping="Wrap" Opacity="0.7" FontSize="12.5" />
+                    <TextBlock x:Name="LabPlayerList" TextWrapping="Wrap" Margin="0,8,0,0" Opacity="0.7" FontSize="12.5" />
+                </StackPanel>
+            </local:MyCard>
+
+            <!-- 高级设置（原「设置 → 联机」页的 EasyTier 选项，随该页下线一并迁入） -->
+            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource Tools.GameLink.TerraCotta.Advanced.Title}"
+                          CanSwap="True">
+                <StackPanel x:Name="PanAdvanced" Margin="25,40,25,20">
+                    <TextBlock TextWrapping="Wrap" Opacity="0.65" FontSize="12.5"
+                               Text="{DynamicResource Tools.GameLink.TerraCotta.Advanced.Description}" />
+                    <Grid Height="28" Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="LinkName" />
+                            <ColumnDefinition Width="200" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                   Text="{DynamicResource Setup.GameLink.Protocol.Preference}" Margin="0,0,12,0" />
+                        <local:MyComboBox Grid.Column="1" x:Name="ComboPreferProtocol" Height="28"
+                                          SelectionChanged="ComboPreferProtocol_SelectionChanged">
+                            <local:MyComboBoxItem Content="{DynamicResource Setup.GameLink.Protocol.Tcp}"
+                                                  ToolTip="{DynamicResource Setup.GameLink.Protocol.Tcp.ToolTip}" />
+                            <local:MyComboBoxItem Content="{DynamicResource Setup.GameLink.Protocol.Udp}"
+                                                  ToolTip="{DynamicResource Setup.GameLink.Protocol.Udp.ToolTip}" />
+                        </local:MyComboBox>
+                        <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.55"
+                                   FontSize="12" Text="{DynamicResource Setup.GameLink.Protocol.Preference.ToolTip}" />
+                    </Grid>
+                    <local:MyCheckBox x:Name="CheckLatencyFirstMode" Height="22" Margin="0,10,0,0"
+                                      Text="{DynamicResource Setup.GameLink.LatencyFirstMode}"
+                                      ToolTip="{DynamicResource Setup.GameLink.LatencyFirstMode.ToolTip}"
+                                      Change="CheckLinkOption_Change" />
+                    <local:MyCheckBox x:Name="CheckTryPunchSym" Height="22" Margin="0,8,0,0"
+                                      Text="{DynamicResource Setup.GameLink.PortGuessNat}"
+                                      ToolTip="{DynamicResource Setup.GameLink.PortGuessNat.ToolTip}"
+                                      Change="CheckLinkOption_Change" />
+                    <local:MyCheckBox x:Name="CheckEnableIPv6" Height="22" Margin="0,8,0,0"
+                                      Text="{DynamicResource Setup.GameLink.EnableIPv6}"
+                                      ToolTip="{DynamicResource Setup.GameLink.EnableIPv6.ToolTip}"
+                                      Change="CheckLinkOption_Change" />
+                    <local:MyCheckBox x:Name="CheckEnableCliOutput" Height="22" Margin="0,8,0,0"
+                                      Text="{DynamicResource Setup.GameLink.CliDebugOutput}"
+                                      ToolTip="{DynamicResource Setup.GameLink.CliDebugOutput.ToolTip}"
+                                      Change="CheckLinkOption_Change" />
+                    <local:MyButton x:Name="BtnDiagnostics" MinWidth="140" Height="30" Margin="0,14,0,0"
+                                    HorizontalAlignment="Left"
+                                    Text="{DynamicResource Tools.GameLink.TerraCotta.Diagnostics.Button}"
+                                    ToolTip="{DynamicResource Tools.GameLink.TerraCotta.Diagnostics.ToolTip}"
+                                    Click="BtnDiagnostics_Click" />
+                </StackPanel>
+            </local:MyCard>
+
+            <!-- 房主教程 -->
+            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource Tools.GameLink.Tutorial.Host.Title}"
+                          CanSwap="True">
+                <StackPanel Margin="25,40,25,20">
+                    <TextBlock TextWrapping="Wrap" LineHeight="22"
+                               Text="{DynamicResource Tools.GameLink.Tutorial.Host.Content}" />
+                </StackPanel>
+            </local:MyCard>
+
+            <!-- 房客教程 -->
+            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource Tools.GameLink.Tutorial.Guest.Title}"
+                          CanSwap="True">
+                <StackPanel Margin="25,40,25,20">
+                    <TextBlock TextWrapping="Wrap" LineHeight="22"
+                               Text="{DynamicResource Tools.GameLink.Tutorial.Guest.Content}" />
+                </StackPanel>
+            </local:MyCard>
+        </StackPanel>
+    </local:MyScrollViewer>
+    <!-- 地区屏蔽：未启用「PCLS 核心插件」时整页显示（与下载页、反馈页同一个占位控件） -->
+    <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                          x:Name="PanRegionBlocked" Visibility="Collapsed">
+        <StackPanel Margin="25,25,25,25">
+            <local:MyCard UseAnimation="False" MinHeight="300" Margin="10,0,10,0">
+                <local:MyUnavailablePlaceholder Text="{DynamicResource Tools.GameLink.RegionBlocked.Message}" />
+            </local:MyCard>
+        </StackPanel>
+    </local:MyScrollViewer>
+  </Grid>
+</local:MyPageRight>

@@ -1,0 +1,13 @@
+{
+  "id": "sgu.welcome",
+  "name": "欢迎语",
+  "version": "1.1.1",
+  "apiVersion": 1,
+  "minHostVersion": "27.1.0",
+  "author": "剑客群组服服主团队",
+  "description": "每次启动 PCL Swordsman 时在右下角弹出欢迎语；欢迎语池可在 PCL\\PluginData\\sgu.welcome\\welcome.txt 里自定义。支持在「插件管理 → 齿轮」里开关与切换来源。",
+  "entry": { "assembly": "Welcome.dll", "type": "Welcome.WelcomePlugin" },
+  "capabilities": ["config", "events", "ui.settings"],
+  "provides": ["welcome.messages"],
+  "ui": { "icon": "lucide/message-circle", "sortOrder": 40 }
+}

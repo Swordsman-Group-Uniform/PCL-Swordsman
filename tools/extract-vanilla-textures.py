@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+"""从原版（Minecraft）客户端 jar 里解出本分支要复用的原版材质。
+
+用法：
+    python3 tools/extract-vanilla-textures.py <client.jar>
+
+`client.jar` 是原版客户端 jar（含 assets），例如 NeoForge 开发环境的
+`~/.gradle/caches/minecraft/versions/1.21.1/client.jar`。
+
+解出的文件（都是**原版贴图，未做任何重绘**）：
+    Plain Craft Launcher 2/Images/Blocks/NetherWartBlock.png      地狱疣块（「下界红」主题）
+    Plain Craft Launcher 2/Images/Blocks/AmethystBlock.png        紫水晶块（「水晶紫」主题）
+    Plain Craft Launcher 2/Images/Particles/cherry_0..11.png      樱花粒子（「樱花粉」主题，12 张 3×3 精灵）
+
+注意：这些是 Mojang 的原版美术资源，仅供本下游分支自用；不要再往别处分发。
+"""
+import sys
+import os
+import zipfile
+
+BLOCKS = {
+    "assets/minecraft/textures/block/nether_wart_block.png": "NetherWartBlock.png",
+    "assets/minecraft/textures/block/amethyst_block.png": "AmethystBlock.png",
+}
+PARTICLES = [f"assets/minecraft/textures/particle/cherry_{i}.png" for i in range(12)]
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BLOCK_DIR = os.path.join(ROOT, "Plain Craft Launcher 2", "Images", "Blocks")
+PARTICLE_DIR = os.path.join(ROOT, "Plain Craft Launcher 2", "Images", "Particles")
+
+
+def main() -> int:
+    if len(sys.argv) < 2:
+        print(__doc__)
+        return 2
+
+    jar = sys.argv[1]
+    if not os.path.isfile(jar):
+        print(f"!! 找不到 jar：{jar}")
+        return 2
+
+    os.makedirs(BLOCK_DIR, exist_ok=True)
+    os.makedirs(PARTICLE_DIR, exist_ok=True)
+
+    with zipfile.ZipFile(jar) as z:
+        names = set(z.namelist())
+        written = 0
+        for src, dst_name in BLOCKS.items():
+            if src not in names:
+                print(f"!! jar 里没有 {src}")
+                continue
+            data = z.read(src)
+            open(os.path.join(BLOCK_DIR, dst_name), "wb").write(data)
+            print(f"  {src} -> Images/Blocks/{dst_name}（{len(data)} B）")
+            written += 1
+
+        for src in PARTICLES:
+            if src not in names:
+                print(f"!! jar 里没有 {src}")
+                continue
+            data = z.read(src)
+            open(os.path.join(PARTICLE_DIR, os.path.basename(src)), "wb").write(data)
+            written += 1
+        print(f"  {len(PARTICLES)} 张樱花粒子 -> Images/Particles/")
+
+    print(f"完成：共写出 {written} 个文件")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

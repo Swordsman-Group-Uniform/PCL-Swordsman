@@ -1,0 +1,26 @@
+{
+  "id": "sgu.pack",
+  "name": "SGU 插件包",
+  "version": "1.1.1",
+  "apiVersion": 1,
+  "minHostVersion": "27.1.0",
+  "author": "剑客群组服服主团队",
+  "description": "为 PCL Swordsman 提供扩展主题（剑客黄、樱花粉、下界红、甲基橙、水晶紫、初音绿、烤音绿、自定义主题色）与回声洞语录。",
+  "entry": {
+    "assembly": "SguPack.dll",
+    "type": "SguPack.SguPackPlugin"
+  },
+  "capabilities": [
+    "config",
+    "ui.page",
+    "ui.sidebar"
+  ],
+  "provides": [
+    "themes.extended", "themes.custom-color",
+    "echo-cave"
+  ],
+  "ui": {
+    "icon": "lucide/palette",
+    "sortOrder": 10
+  }
+}

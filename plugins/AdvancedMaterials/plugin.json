@@ -1,0 +1,13 @@
+{
+  "id": "sgu.advanced-materials",
+  "name": "高级材质",
+  "version": "1.0.1",
+  "apiVersion": 1,
+  "minHostVersion": "27.1.0",
+  "author": "剑客群组服服主团队",
+  "description": "为启动器提供云母 / Aero 高级材质效果（标题栏与主界面分别可调模糊、着色与不透明度）。",
+  "entry": { "assembly": "AdvancedMaterials.dll", "type": "AdvancedMaterials.AdvancedMaterialsPlugin" },
+  "capabilities": ["config"],
+  "provides": ["materials.advanced"],
+  "ui": { "icon": "lucide/layers", "sortOrder": 30 }
+}

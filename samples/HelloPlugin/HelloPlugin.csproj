@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!--
+        示例插件（M1 验收用）。
+        注意：不复制 PCL.PluginSdk.dll 到输出目录——契约程序集由宿主提供，
+        插件自带会导致类型身份分裂（InvalidCastException）。
+    -->
+    <PropertyGroup>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
+        <LangVersion>14</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AssemblyName>HelloPlugin</AssemblyName>
+        <RootNamespace>MyPlugin</RootNamespace>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU;x64;ARM64</Platforms>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\PCL.PluginSdk\PCL.PluginSdk.csproj">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="plugin.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+</Project>
