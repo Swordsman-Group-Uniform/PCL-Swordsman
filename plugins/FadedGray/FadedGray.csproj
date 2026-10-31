@@ -18,7 +18,10 @@
   </ItemGroup>
   <!-- 标题栏装饰图直接嵌进 DLL：插件包只带 dll + plugin.json，运行时读清单流，不碰资源 URI -->
   <ItemGroup>
-    <EmbeddedResource Include="Faded.jpg" LogicalName="FadedGray.Faded.jpg" />
+    <!-- 公开仓库不含这张图（用户提供的素材）。本地放好 Faded.jpg 才会打进去；缺它时插件照样能编译，
+       只是标题栏装饰会退化成「没有装饰」（日志会提示装饰图加载失败）。 -->
+  <EmbeddedResource Include="Faded.jpg" LogicalName="FadedGray.Faded.jpg"
+                    Condition="Exists('Faded.jpg')" />
   </ItemGroup>
   <ItemGroup><None Update="plugin.json" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
 </Project>

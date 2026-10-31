@@ -1,85 +1,143 @@
-> ## ⚠️ 这是 **PCL Swordsman**（PCL CE 的下游分支），不是 PCL CE 官方仓库
->
-> - 维护：**剑客群组服服主团队**；内部分享用途，**非官方发布**，不代表 PCL Community / 龙腾猫跃的任何立场
-> - **反馈功能已禁用**：请不要向上游（PCL Community / PCL2-CE）提 issue 或 PR；
->   本分支的问题请联系 `hmjmfabc@swordsman.top`、`mingyugames@swordsman.top`
-> - 更新 / 自动更新 / 云端公告在本分支**已在代码层禁用**
-> - 接手维护请看 **`README-FIRST.md`**（导览）与 **`HANDOFF-2026-10-31-preview-73.md`**（最新交接书）
-> - 下方内容为上游 PCL CE 的原始说明，**上游链接仅作溯源与致谢**，与本分支的下载 / 反馈渠道无关
-> - 许可：上游 Apache-2.0（见 `LICENSE`），保留全部上游版权声明；分区内的原版（Minecraft）材质仅本分支自用
+# PCL Swordsman
+
+**PCL Swordsman** 是 [PCL CE](https://github.com/PCL-Community/PCL-CE)（Plain Craft Launcher Community Edition）的下游分支，
+由 **剑客群组服服主团队**（Swordsman Group Uniform）维护，供 SGU 及相关服务器成员内部分享使用。
+技术栈 **C# / WPF / .NET 10**，Windows 10 / 11 桌面应用。当前版本 **`27.1-preview-73`**（预发布）。
+
+> A downstream fork of **PCL CE** maintained by the **Swordsman Group Uniform** server group, for internal use by
+> SGU members. Built with **C# / WPF / .NET 10** for Windows 10 / 11. Current version: **`27.1-preview-73`** (pre-release).
 
 ---
 
-**简体中文** | [English](README-EN.md) | [繁體中文](README-ZH_TW.md)
+## 中文
 
-<div align="center">
+### 这是什么 / 不是什么
 
-<img src="Plain Craft Launcher 2/Images/icon.ico" alt="Logo" width="80" height="80">
+- ✅ 一个**能实际用起来的启动器**：重做了窗口材质，追加多套主题，并把插件系统从骨架补成可用体系
+- ✅ 一个**可复用的插件平台**：契约 SDK、四阶段加载、事件总线、插件设置与页面、权限授权、完整性校验与签名
+- ❌ **不是 PCL CE 官方仓库**，不代表 PCL Community 或原作者龙腾猫跃的任何立场
+- ❌ **请勿**向上游仓库（PCL Community / PCL2-CE）提交 issue 或 PR
+- ❌ 更新 / 自动更新 / 云端公告**已在代码层禁用**；联机固定 **EasyTier 纯 P2P**
 
-# PCL Community Edition
+### 特色
 
-[![Stars](https://img.shields.io/github/stars/PCL-Community/PCL-CE?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiI+PHBhdGggZD0iTTggLjI1YS43NS43NSAwIDAgMSAuNjczLjQxOGwxLjg4MiAzLjgxNSA0LjIxLjYxMmEuNzUuNzUgMCAwIDEgLjQxNiAxLjI3OWwtMy4wNDYgMi45Ny43MTkgNC4xOTJhLjc1MS43NTEgMCAwIDEtMS4wODguNzkxTDggMTIuMzQ3bC0zLjc2NiAxLjk4YS43NS43NSAwIDAgMS0xLjA4OC0uNzlsLjcyLTQuMTk0TC44MTggNi4zNzRhLjc1Ljc1IDAgMCAxIC40MTYtMS4yOGw0LjIxLS42MTFMNy4zMjcuNjY4QS43NS43NSAwIDAgMSA4IC4yNVoiIGZpbGw9IiNlYWM1NGYiLz48L3N2Zz4=&logoSize=auto&label=stars&labelColor=444444&color=eac54f)](https://github.com/PCL-Community/PCL-CE/)
-![GitHub Release](https://img.shields.io/github/v/release/PCL-Community/PCL-CE?label=release&logo=github&style=for-the-badge)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PCL-Community/PCL-CE/build-test.yml?style=for-the-badge)
+| 功能 | 说明 |
+| --- | --- |
+| **窗口材质** | Win11 22621+ 走 DWM 云母 / 亚克力；Win10 走系统 `AccentBlur`，并把界面铺满窗口，使**磨砂范围与界面完全等大** |
+| **液态玻璃** | 整块启动器是一块大圆角玻璃 + 一条玻璃竖分隔线；主界面每张卡片是小玻璃；药丸、对话框、Toast 同为玻璃，不透明度全部可调 |
+| **主题** | 多套内置主题与专属标题栏装饰（钻石剑 / **原版樱花粒子** / 原版方块贴图 / 像素化学式），并支持**插件自带主题** |
+| **插件系统（M0–M4）** | 契约 SDK、四阶段加载（发现 / 版本 / 依赖拓扑 / 加载）、事件总线、插件设置与插件页面、权限授权、`files` 哈希 + ECDSA 签名、更新检测、崩溃熔断、共享插件目录 |
+| **本地化** | 8 个语言文件完全键对齐：zh-CN / zh_sgu / zh-TW / en-US / en-GB / ja-JP / fr-FR / es-ES |
+| **一键启动** | 为实例生成快捷方式：名称 = 实例名、图标 = 该实例图标，启动后自动隐藏启动器 |
 
-[![Issues](https://img.shields.io/github/issues/PCL-Community/PCL-CE?style=for-the-badge&label=issues&labelColor=444444&color=1F883D&logo=github)](https://github.com/PCL-Community/PCL-CE/issues)
-[![Pull requests](https://img.shields.io/github/issues-pr/PCL-Community/PCL-CE?style=for-the-badge&label=pull%20requests&labelColor=444444&color=1F883D&logo=github)](https://github.com/PCL-Community/PCL-CE/pulls)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/PCL-Community/PCL-CE/total?style=for-the-badge)
-[![哔哩哔哩](https://img.shields.io/badge/动态-bilibili-00A4DB?style=for-the-badge&labelColor=444444&logo=bilibili)](https://space.bilibili.com/3546847192811755/dynamic) <br />
+插件市场（M5 剩余部分）**未实现**；`game-argv` / `process` 等高危插件 API **明确不开放**。
 
-<a href="https://trendshift.io/repositories/21800?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-21800" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/21800/weekly?language=C%23" alt="PCL-Community%2FPCL-CE | Trendshift" width="250" height="55"/></a>
-<a href="https://trendshift.io/repositories/21800" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/21800" alt="PCL-Community%2FPCL-CE | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+### 下载
 
-[社区版下载](https://github.com/PCL-Community/PCL-CE/releases/latest) |
-[上游存储库](https://github.com/Meloong-Git/PCL)
+构建产物不进 Git 仓库，请从本仓库的 **Releases** 获取 `PCLCE For SGU <版本>.exe` 与插件包（`.pclpkg`）。
 
-[提交问题](https://github.com/PCL-Community/PCL-CE/issues/new/choose) |
-[贡献指南](https://github.com/PCL-Community/PCL-CE/wiki/开发指南)
+### 从源码构建
 
-</div>
+```powershell
+# Windows（推荐）：需要 .NET SDK 10
+powershell -ExecutionPolicy Bypass -File tools\build.ps1
+```
 
-PCL CE 是基于 PCL 开源代码二次开发的社区版本，包括了主线暂未制作的功能和改进！
+```bash
+# Termux / Linux 交叉构建
+DOTNET_gcServer=0 ./build.sh x64 Release
+```
 
-社区版的版本号与主线并非严格对应关系，也请不要向官方仓库反馈社区版问题。
+先打插件包（`plugins/package.ps1|sh`）再 `dotnet publish`，否则内嵌插件会报 `CS1566`。
+完整流程见 [`README-FIRST.md`](README-FIRST.md) 与 [`HANDOFF-2026-10-31-preview-73.md`](HANDOFF-2026-10-31-preview-73.md)。
 
-欢迎大家来用用看！
+> ⚠️ 公开仓库**不包含**从原版 Minecraft 客户端提取的贴图等不宜公开分发的资源，
+> 需要时请用 `tools/extract-vanilla-textures.py <client.jar>` 本地生成。
 
-**开发群:** [599620549](https://qm.qq.com/q/PNQA4Md8wc)[✦](https://t.me/+78XW2bUOvKJjMTZl) | **用户 1 群:** [1028074835](https://qm.qq.com/q/qrMGJo8BQQ) | **用户 2 群:** [1070029541](https://qm.qq.com/q/lBywbDMWhG)
+### 目录
 
-## 💻 支持平台
+```
+Plain Craft Launcher 2/   启动器主程序（WPF：页面、控件、材质与玻璃）
+PCL.Core/                 核心库：配置、主题配色、本地化、窗口互操作、模糊控件
+PCL.PluginSdk/            插件契约（接口与 DTO，只增不改）
+PCL.PluginHost/           插件加载器（发现 / 版本 / 依赖 / 完整性 / 签名 / 熔断）
+plugins/ samples/         随包插件与示例插件
+tools/                    构建与素材工具（build.ps1、贴图提取、插件签名器）
+docs/                     插件接口文档、日志排查手册、内部设计笔记
+```
 
-| 操作系统 | 支持情况 | 环境要求 |
-|---|---|---|
-| Windows 10 1809 (17763) 或更高 | ✅ 完整支持 | [.NET 10 Desktop Runtime](https://get.dot.net/10) |
-| Windows 8 - Windows 10 1809 (17763) | ⚠️ 理论能跑，酌情提供社区支持 | [.NET 10 Desktop Runtime](https://get.dot.net/10) |
-| Windows 7 或更低版本 | ❌ 不支持 | / |
-| macOS / Linux / 其他操作系统 | ⚠️ 仅跨平台开发支持（交叉编译） | [.NET 10 SDK](https://get.dot.net/10) |
+### 反馈
 
-**✅ 完整支持**：尽可能提供一切相关支持，但必须确保启动器为最新版本。
+邮箱 `hmjmfabc@swordsman.top`、`mingyugames@swordsman.top`；请在本仓库提 issue，**不要**去上游。
 
-**⚠️ 理论能跑，酌情提供社区支持**：PCL CE 应该可以在这些平台上运行，但不保证功能完全可用。你可能需要升级到完整支持的系统版本以获得进一步社区技术支持。
+### 致谢与许可
 
-**❌ 不支持**：PCL CE 在这些平台的可用性较低，甚至压根打不开。请升级操作系统以使用 PCL CE。
+- 上游：[PCL CE](https://github.com/PCL-Community/PCL-CE)（Apache-2.0）与原作者 [龙腾猫跃](https://github.com/Meloong-Git)
+  的 [PCL](https://github.com/Meloong-Git/PCL)；上游代码版权归 **PCL Community** 与 **龙腾猫跃**
+- 本分支按仓库 [`LICENSE`](LICENSE)（Apache-2.0）分发，保留全部上游声明
+- 原版 Minecraft 贴图版权归 **Mojang Studios**，仅本地使用、不再分发
+- 第三方组件许可清单见 [`Plain Craft Launcher 2/metadata.json`](Plain%20Craft%20Launcher%202/metadata.json) 的 `licenses`
 
-**⚠️ 仅跨平台开发支持（交叉编译）**：PCL CE 的源代码可以在 macOS 与 Linux 平台编译，但无法直接运行。作为开发者，你可以在这些平台上进行开发，然后将编译产物转移到 Windows 系统测试。
+---
 
-**注**：    
-社区仅对最新版本的启动器提供支持。    
-取决于部分问题的特殊性（如系统不完整），有时你仍然必须升级操作系统以继续获得支持。    
-PCL CE 始终建议使用最新版本的操作系统以获得最佳体验。    
-你仍然可以尝试在不受支持的系统上使用 PCL CE，但可能会遇到很多额外问题。
+## English
 
-## 🔒 许可证
+### What it is / is not
 
-- `Plain Craft Launcher 2/` 使用 [自定义许可证](https://github.com/PCL-Community/PCL-CE/blob/dev/Plain%20Craft%20Launcher%202/LICENCE)
-- `其余所有目录` 使用 [Apache License 2.0](https://github.com/PCL-Community/PCL-CE/blob/dev/LICENSE)
+- ✅ A **working launcher**: window materials rebuilt, several themes added, plugin system taken from skeleton to a
+  usable platform
+- ✅ A **reusable plugin platform**: contract SDK, four-stage loading, event bus, plugin settings & pages, permission
+  grants, integrity hashes + ECDSA signing
+- ❌ **Not** an official PCL CE repository; not affiliated with PCL Community or the original author
+- ❌ Do **not** file issues or PRs upstream (PCL Community / PCL2-CE)
+- ❌ Update checking / auto-update / cloud announcements are **disabled in code**; multiplayer is **EasyTier pure P2P**
 
-## 🌟 统计数据
-![Alt](https://repobeats.axiom.co/api/embed/3e46296e6e3a134991a783480fd2f62723bb0353.svg "Repobeats analytics image")
+### Highlights
 
-[![Star History Chart](https://api.star-history.com/chart?repos=PCL-Community/PCL-CE&type=date&legend=top-left&sealed_token=Ts-GaAXJ5nb9fJERusrXneo05pfZ83tMhReHJ98nmmlemBTqHS5Ozocdep1MTMdsX-6CRiQH9TqiS1Kk7SxjTfk02eUOxnm25oHff6TLLvrY7pGujOkU1IwjVFQLE-5GJYogutJAyI78jujBlOnpk3J2OKAY1PBhmkyUOzW1C1sdz5BzPbj2eBbJGvDx)](https://www.star-history.com/?repos=PCL-Community%2FPCL-CE&type=date&legend=top-left)
+| Feature | Notes |
+| --- | --- |
+| **Window materials** | Win11 22621+ uses DWM Mica/Acrylic; Win10 uses system `AccentBlur` with the UI made full-bleed, so the **frost rectangle matches the UI rectangle exactly** |
+| **Liquid glass** | The launcher is one large rounded glass pane plus a glass divider; main-UI cards are small glass tiles; pills, dialogs and toasts are glass too — all opacities configurable |
+| **Themes** | Several built-in themes with dedicated title-bar decorations (diamond sword, **vanilla cherry-blossom particles**, vanilla block textures, pixel-art formula) plus **plugin-provided themes** |
+| **Plugin system (M0–M4)** | Contract SDK, four-stage loading (discover / host-version / dependency graph / load), event bus, plugin settings & pages, permission grants, `files` hashes + ECDSA signing, update checking, crash circuit breaker, shared plugin directory |
+| **Localization** | 8 key-aligned language files: zh-CN, zh_sgu, zh-TW, en-US, en-GB, ja-JP, fr-FR, es-ES |
+| **One-click launch** | Creates a shortcut named after the instance, uses that instance's icon, then hides the launcher |
 
-**此页浏览量**（总计 / 今日）：[![Hits](https://hits.zkitefly.eu.org/?tag=https://github.com/PCL-Community/PCL-CE)](https://hits.zkitefly.eu.org/?tag=https://github.com/PCL-Community/PCL-CE&web=true)
-## ❤️ 贡献者
+The plugin marketplace (remaining part of M5) is **not implemented**; high-risk plugin APIs (`game-argv`, `process`)
+are **intentionally not exposed**.
 
-[![](https://contrib.rocks/image?repo=PCL-Community/PCL-CE)](https://github.com/PCL-Community/PCL-CE/graphs/contributors)
+### Download
+
+Build outputs are not committed — grab `PCLCE For SGU <version>.exe` and the `.pclpkg` bundles from **Releases**.
+
+### Build from source
+
+```powershell
+# Windows (recommended): requires .NET SDK 10
+powershell -ExecutionPolicy Bypass -File tools\build.ps1
+```
+
+```bash
+# Termux / Linux cross-build
+DOTNET_gcServer=0 ./build.sh x64 Release
+```
+
+Package the plugins first (`plugins/package.ps1|sh`), then `dotnet publish`, otherwise embedded plugin resources fail
+with `CS1566`. See [`README-FIRST.md`](README-FIRST.md) for the full workflow.
+
+> ⚠️ This public repository **does not include** assets extracted from the vanilla Minecraft client; regenerate them
+> locally with `tools/extract-vanilla-textures.py <client.jar>`.
+
+### Feedback
+
+E-mail: `hmjmfabc@swordsman.top`, `mingyugames@swordsman.top` — please open issues in **this** repository, not upstream.
+
+### Credits & License
+
+- Upstream: [PCL CE](https://github.com/PCL-Community/PCL-CE) (Apache-2.0) and the original
+  [PCL](https://github.com/Meloong-Git/PCL) by [龙腾猫跃](https://github.com/Meloong-Git); upstream code is
+  © PCL Community and 龙腾猫跃
+- This fork is distributed under the repository [`LICENSE`](LICENSE) (Apache-2.0), all upstream notices preserved
+- Vanilla Minecraft textures are © Mojang Studios; used locally only, not redistributed
+- Third-party licences: see the `licenses` field of
+  [`Plain Craft Launcher 2/metadata.json`](Plain%20Craft%20Launcher%202/metadata.json)

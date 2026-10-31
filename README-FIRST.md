@@ -5,6 +5,20 @@
 
 ---
 
+## 0.0 公开仓库里**故意没有**的两样东西
+
+本仓库是公开的（`Swordsman-Group-Uniform/PCL-Swordsman`），因此以下资源**不提交**，克隆后需要本地补齐：
+
+| 缺的东西 | 补齐办法 |
+| --- | --- |
+| 原版（Minecraft）贴图：`Images/Blocks/NetherWartBlock.png`、`AmethystBlock.png`、`Images/Particles/cherry_*.png` | `python3 tools/extract-vanilla-textures.py <原版 client.jar>`（版权归 Mojang，仅本地使用、不要分发） |
+| `plugins/FadedGray/Faded.jpg`（Faded灰 主题的标题栏装饰图，用户提供的素材） | 自己放一张同名图片到 `plugins/FadedGray/`；缺它时插件仍能编译，只是装饰会退化成「没有装饰」 |
+
+其余上游自带资源、构建产物、日志、第三方参考仓库（`HMCL-main` 等）也都不入库；
+构建产物请从 Releases 取，或用 `tools/build.ps1` / `./build.sh` 自行构建。
+
+---
+
 ## 0. ⛔ 死规矩：遇到任何问题，先读日志，再动代码
 
 - 日志：`<exe 同级>\PCL\Log\Launch-<日期>-<时分秒毫秒>.log`（应用内「设置 → 查看日志 → 导出日志」同款）
