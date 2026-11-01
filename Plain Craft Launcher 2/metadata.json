@@ -1,10 +1,10 @@
 {
   "name": "Plain Craft Launcher 2 Swordsman",
   "version": {
-    "base": "27.1",
+    "base": "27.1.1",
     "upstream": "2.15.2",
-    "suffix": "",
-    "code": 610
+    "suffix": "snapshot-85",
+    "code": 611
   },
   "licenses": [
     {

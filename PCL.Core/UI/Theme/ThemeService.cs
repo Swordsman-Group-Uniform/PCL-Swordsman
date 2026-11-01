@@ -346,7 +346,8 @@ public sealed partial class ThemeService
             ColorTheme.DeathBlue => (268d, -0.05, -0.1),
             ColorTheme.HmclBlue => (275d, -0.03, -0.35),
             ColorTheme.Custom => _GetThemeArgsFromHex(Config.Preference.Theme.CustomColor, (255d, 0d, -0.2)),
-            ColorTheme.FatFishBlue => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.FatFishBlue, "#5A67AC"), (250d, 0d, -0.2)),
+            // 肥鱼蓝：取 DeepSeek Logo 的主色 #4D6BFE
+            ColorTheme.FatFishBlue => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.FatFishBlue, "#4D6BFE"), (250d, 0d, -0.2)),
             ColorTheme.TianyiBlue => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.TianyiBlue, "#66CCFF"), (230d, 0.2d, 0.1d)),
             ColorTheme.SwordsmanYellow => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.SwordsmanYellow, "#E8B33C"), (75d, 0d, 0d)),
             ColorTheme.MikuGreen => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.MikuGreen, "#39C5BB"), (190d, 0d, 0d)),

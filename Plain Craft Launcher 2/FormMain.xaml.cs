@@ -703,6 +703,7 @@ public partial class FormMain
     ///         <item>下界红 → 整条标题栏的地狱疣块贴图</item>
     ///         <item>甲基橙 → 右上角的甲基橙化学式像素字</item>
     ///         <item>水晶紫 → 整条标题栏的紫水晶块贴图</item>
+    ///         <item>肥鱼蓝 → 右上角低透明度的肥鱼像</item>
     ///     </list>
     /// </summary>
     public void RefreshTitleSword()
@@ -725,6 +726,7 @@ public partial class FormMain
         RectTitleNether.Visibility = theme == ColorTheme.NetherRed ? Visibility.Visible : Visibility.Collapsed;
         RectTitleAmethyst.Visibility = theme == ColorTheme.AmethystPurple ? Visibility.Visible : Visibility.Collapsed;
         ImgTitleFormula.Visibility = theme == ColorTheme.MethylOrange ? Visibility.Visible : Visibility.Collapsed;
+        ImgTitleFatFish.Visibility = theme == ColorTheme.FatFishBlue ? Visibility.Visible : Visibility.Collapsed;
     }
 
     /// <summary>

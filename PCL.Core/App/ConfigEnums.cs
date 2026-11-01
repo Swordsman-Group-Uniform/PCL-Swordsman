@@ -45,7 +45,7 @@ public enum ColorTheme
     Custom = 4,
 
     /// <summary>
-    /// 肥鱼蓝（#5A67AC）。
+    /// 肥鱼蓝（#4D6BFE，DeepSeek Logo 主色）。
     /// </summary>
     FatFishBlue = 5,
 
