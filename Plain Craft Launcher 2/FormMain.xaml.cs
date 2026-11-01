@@ -47,8 +47,8 @@ public partial class FormMain
             else
                 changelog = Lang.Text("Main.UpdateLog.Empty");
             if (ModMain.MyMsgBoxMarkdown(changelog,
-                    Lang.Text("Main.UpdateLog.Title", ModBase.versionBranchName, ModBase.versionDisplayName), Lang.Text("Common.Action.Confirm"), Lang.Text("Main.UpdateLog.FullChangelog")) ==
-                2) ModBase.OpenWebsite("https://github.com/PCL-Community/PCL2-CE/releases");
+                    Lang.Text("Main.UpdateLog.Title", ModBase.versionDisplayName), Lang.Text("Common.Action.Confirm"), Lang.Text("Main.UpdateLog.FullChangelog")) ==
+                2) ModBase.OpenWebsite("https://github.com/Swordsman-Group-Uniform/PCL-Swordsman/releases");
         }, "UpdateLog Output");
     }
 

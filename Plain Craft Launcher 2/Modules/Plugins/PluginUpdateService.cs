@@ -86,7 +86,8 @@ internal static class PluginUpdateService
                     message += "\n\n" + info.Notes;
 
                 var accepted = false;
-                ModBase.RunInUi(() => accepted = ModMain.MyMsgBox(message,
+                // 阻塞版本：否则 accepted 在弹窗之前就被读走，更新永远装不上
+                ModBase.RunInUiWait(() => accepted = ModMain.MyMsgBox(message,
                     Lang.Text("Tools.Plugin.Update.Title"),
                     button2: Lang.Text("Common.Action.Cancel")) == 1);
                 if (!accepted) return;

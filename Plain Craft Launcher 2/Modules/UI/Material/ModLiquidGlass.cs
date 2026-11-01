@@ -53,6 +53,7 @@ internal static class ModLiquidGlass
     private static bool _isApplied;
 
     // 原始值缓存（只可能有一份，用静态字段即可）
+    private static bool _dividerOriginalsCaptured;
     private static Brush? _originalDividerFill;
     private static double _originalDividerWidth = double.NaN;
     private static Effect? _originalDividerEffect;
@@ -222,9 +223,15 @@ internal static class ModLiquidGlass
         var divider = frm.RectLeftShadow;
         if (divider is null) return;
 
-        _originalDividerFill ??= divider.Fill;
-        if (double.IsNaN(_originalDividerWidth)) _originalDividerWidth = divider.Width;
-        _originalDividerEffect ??= divider.Effect;
+        // 必须用独立标记：原值可能本来就是 null，用 ??= 会在第二次 Refresh 时把我们的白色发光当成原值
+        if (!_dividerOriginalsCaptured)
+        {
+            _dividerOriginalsCaptured = true;
+            _originalDividerFill = divider.Fill;
+            _originalDividerWidth = divider.Width;
+            _originalDividerEffect = divider.Effect;
+        }
+
 
         var alpha = Math.Clamp(ModMaterial.DividerOpacity, 0d, 1d);
         divider.Width = DividerWidth;
@@ -274,8 +281,10 @@ internal static class ModLiquidGlass
     /// <summary>药丸玻璃样式：着色 + 高光边。</summary>
     private static void StylePill(MyRadioButton pill, double alpha)
     {
-        _pillOriginals.AddOrUpdate(pill, new PillOriginal(pill.Background, pill.BorderBrush,
-            pill.BorderThickness));
+        // 只在**第一次**看到这个药丸时记原值：AddOrUpdate 每次都会覆盖，
+        // 结果把已经玻璃化的样式当成原值，退出玻璃模式后药丸恢复成玻璃配色
+        if (!_pillOriginals.TryGetValue(pill, out _))
+            _pillOriginals.Add(pill, new PillOriginal(pill.Background, pill.BorderBrush, pill.BorderThickness));
 
         pill.Background = new SolidColorBrush(WithAlpha(ThemeBackgroundColor(), alpha));
         pill.BorderThickness = new Thickness(1d);
@@ -352,6 +361,16 @@ internal static class ModLiquidGlass
 
     #region 还原
 
+    /// <summary>放掉所有浮层引用（窗口已销毁时用）。</summary>
+    private static void ReleaseOverlayReferences()
+    {
+        _tintOverlay = null;
+        _sheenOverlay = null;
+        _refractionRing = null;
+        _hairline = null;
+        _isApplied = false;
+    }
+
     private static void Clear()
     {
         if (!_isApplied) return;
@@ -360,7 +379,12 @@ internal static class ModLiquidGlass
         try
         {
             var frm = ModMain.frmMain;
-            if (frm is null) return;
+            if (frm is null)
+            {
+                // 窗口已经没了：直接丢引用，避免新窗口 Insert 时抛「element already has a logical parent」
+                ReleaseOverlayReferences();
+                return;
+            }
 
             // 圆角恢复
             try

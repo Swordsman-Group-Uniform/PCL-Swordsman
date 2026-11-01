@@ -10,7 +10,7 @@
             <!-- 更新已禁用：居中的红色占位（图标 + 说明），其余内容全部隐藏 -->
             <local:MyCard x:Name="PanUnsupported" Visibility="Collapsed" UseAnimation="False" MinHeight="300">
                 <local:MyUnavailablePlaceholder x:Name="UnsupportedHint"
-                                                Text="{DynamicResource Setup.Update.Unsupported}" />
+                                                Text="{DynamicResource Setup.Update.Unsupported.Manual}" />
             </local:MyCard>
             <local:MyHint x:Name="HintUpdateUnsupported" Margin="10,0,10,15" Theme="Yellow"
                           Text="{DynamicResource Setup.Update.Unsupported}" Visibility="Collapsed" />
@@ -135,6 +135,11 @@
                         <local:MyButton x:Name="BtnChangelog" Text="{DynamicResource Setup.Update.Changelog.View}" ColorType="Normal" Grid.Row="0"
                                         Grid.RowSpan="2" Grid.Column="5" HorizontalAlignment="Stretch" MinWidth="110"
                                         TextPadding="16" Padding="4,0" VerticalAlignment="Stretch" Click="BtnChangelog_Click" />
+                        <!-- 不支持自动更新时，右侧给一个手动下载入口（跳转本仓库 Releases） -->
+                        <local:MyButton x:Name="BtnDownloadManual" Text="{DynamicResource Setup.Update.DownloadManual}"
+                                        ColorType="Highlight" Grid.Row="0" Grid.RowSpan="2" Grid.Column="3"
+                                        HorizontalAlignment="Stretch" MinWidth="140" TextPadding="18" Padding="4,0"
+                                        VerticalAlignment="Stretch" Visibility="Collapsed" Click="BtnDownloadManual_Click" />
                     </Grid>
                 </StackPanel>
             </local:MyCard>

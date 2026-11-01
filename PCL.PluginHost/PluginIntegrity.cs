@@ -75,6 +75,20 @@ public static class PluginIntegrity
             // ② 签名
             if (hasSignature)
             {
+                // 签名载荷 = id + version + 文件哈希。没有 files 时载荷只剩 id+version，
+                // 换掉入口程序集照样「验签通过」——所以带签名必须同时声明 files，且覆盖入口程序集。
+                if (!hasFiles)
+                    return new PluginIntegrityResult(PluginIntegrityState.Mismatch,
+                        "插件声明了签名但没有 files 哈希表（签名无法保护程序集内容）");
+
+                var entryAssembly = manifest.Entry?.Assembly;
+                if (!string.IsNullOrWhiteSpace(entryAssembly) &&
+                    !manifest.Files.Keys.Any(key =>
+                        string.Equals(key.Replace('\\', '/'), entryAssembly.Replace('\\', '/'),
+                            StringComparison.OrdinalIgnoreCase)))
+                    return new PluginIntegrityResult(PluginIntegrityState.Mismatch,
+                        $"files 里没有入口程序集 {entryAssembly} 的哈希");
+
                 var signature = manifest.Signature!;
                 if (!string.Equals(signature.Algorithm, PluginSignature.AlgorithmEcdsaP256,
                         StringComparison.OrdinalIgnoreCase))
@@ -198,7 +212,8 @@ public static class PluginIntegrity
         foreach (var key in TrustedPublicKeys)
         {
             if (string.IsNullOrWhiteSpace(key)) continue;
-            if (string.IsNullOrWhiteSpace(keyId)) return key;
+            // keyId 为空时**不能**随便挑一个受信密钥：那等于取消了密钥固定
+            if (string.IsNullOrWhiteSpace(keyId)) continue;
 
             var fingerprint = ComputeKeyId(key);
             if (string.Equals(fingerprint, keyId.Trim(), StringComparison.OrdinalIgnoreCase))

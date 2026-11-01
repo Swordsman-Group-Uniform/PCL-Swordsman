@@ -75,6 +75,8 @@ public sealed class PluginManifest
             var name = raw.Trim();
             // 允许 "ui.page" 这类小写点分写法，也允许枚举名
             name = name.Replace(".", "").Replace("-", "").Replace("_", "");
+            // 纯数字会被 Enum.TryParse 当成位掩码（"2047" 等于拿到全部能力），只接受字母开头的名字
+            if (name.Length == 0 || !char.IsLetter(name[0])) continue;
             if (Enum.TryParse<PluginCapability>(name, true, out var parsed))
                 result |= parsed;
         }

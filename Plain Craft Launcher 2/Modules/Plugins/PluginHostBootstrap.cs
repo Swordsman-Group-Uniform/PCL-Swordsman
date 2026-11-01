@@ -233,7 +233,7 @@ internal static class PluginHostBootstrap
     ///         非正式版：内嵌的插件包全部安装（SGU 插件包 / PCLS 核心插件 / 高级材质 / Hello 示例）。
     ///     </para>
     ///     <para>
-    ///         正式版：**只安装无条件内嵌的三个包 —— PCLS 核心插件、高级材质、欢迎语**，
+    ///         正式版：**只安装无条件内嵌的四个包 —— PCLS 核心插件、高级材质、欢迎语、Hello 示例**，
     ///         并且与测试版一样**默认启用**（2026-10-29 起：HMCL 已恢复下载功能，原先「正式版默认关闭下载解锁」
     ///         的理由不再成立；高级材质与欢迎语也按要求内置）。
     ///         exe 同级 <c>plugins\</c> 目录里手动放置的包在正式版**仍然不会**自动安装，避免「解压即装」。
@@ -250,7 +250,7 @@ internal static class PluginHostBootstrap
             // ② exe 同级 plugins/ 目录：仅非正式版自动安装
             if (ThemeService.IsReleaseDistribution)
             {
-                ModBase.Log("[PluginHost] 正式版构建：内置插件（PCLS 核心插件 / 高级材质 / 欢迎语）已就绪，跳过随包插件目录",
+                ModBase.Log("[PluginHost] 正式版构建：内置插件（PCLS 核心插件 / 高级材质 / 欢迎语 / Hello 示例）已就绪，跳过随包插件目录",
                     ModBase.LogLevel.Debug);
                 return;
             }
@@ -487,12 +487,20 @@ internal static class PluginHostBootstrap
             var names = new Dictionary<ColorTheme, string>();
             foreach (var provider in manager.GetProviders<PCL.PluginSdk.IExtraThemesProvider>())
             {
-                foreach (var theme in provider.GetThemes())
+                // 每个 provider 单独兜底：一个插件抛异常不能连带丢掉其他插件的主题 / 语录 / 欢迎语
+                try
                 {
-                    if (string.IsNullOrWhiteSpace(theme.Key)) continue;
-                    if (!Enum.TryParse<ColorTheme>(theme.Key.Trim(), true, out var parsed)) continue;
-                    definitions[parsed] = (theme.Hex ?? "", theme.Flavor);
-                    if (!string.IsNullOrWhiteSpace(theme.DisplayName)) names[parsed] = theme.DisplayName;
+                    foreach (var theme in provider.GetThemes())
+                    {
+                        if (string.IsNullOrWhiteSpace(theme.Key)) continue;
+                        if (!Enum.TryParse<ColorTheme>(theme.Key.Trim(), true, out var parsed)) continue;
+                        definitions[parsed] = (theme.Hex ?? "", theme.Flavor);
+                        if (!string.IsNullOrWhiteSpace(theme.DisplayName)) names[parsed] = theme.DisplayName;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModBase.Log(ex, "[Plugin] 读取插件主题定义失败（已跳过该插件）", ModBase.LogLevel.Hint);
                 }
             }
 
@@ -524,14 +532,32 @@ internal static class PluginHostBootstrap
             // 回声洞语录
             var quotes = new List<string>();
             foreach (var provider in manager.GetProviders<PCL.PluginSdk.IEchoCaveQuotesProvider>())
-                quotes.AddRange(provider.GetQuotes());
+            {
+                try
+                {
+                    quotes.AddRange(provider.GetQuotes());
+                }
+                catch (Exception ex)
+                {
+                    ModBase.Log(ex, "[Plugin] 读取回声洞语录失败（已跳过该插件）", ModBase.LogLevel.Hint);
+                }
+            }
 
             ModEchoCave.SetQuotes(quotes);
 
             // 启动欢迎语（插件提供池，宿主抽一条并用右下角小提示显示）
             var welcome = new List<string>();
             foreach (var provider in manager.GetProviders<PCL.PluginSdk.IWelcomeMessagesProvider>())
-                welcome.AddRange(provider.GetWelcomeMessages());
+            {
+                try
+                {
+                    welcome.AddRange(provider.GetWelcomeMessages());
+                }
+                catch (Exception ex)
+                {
+                    ModBase.Log(ex, "[Plugin] 读取欢迎语失败（已跳过该插件）", ModBase.LogLevel.Hint);
+                }
+            }
 
             ModWelcome.SetMessages(welcome);
 
@@ -569,7 +595,8 @@ internal static class PluginHostBootstrap
         public string? PickFile(string? filter = null)
         {
             string? result = null;
-            ModBase.RunInUi(() =>
+            // 阻塞版本：RunInUi 是异步的，后台线程会拿到 null
+            ModBase.RunInUiWait(() =>
             {
                 var dialog = new Microsoft.Win32.OpenFileDialog
                 {
@@ -585,7 +612,7 @@ internal static class PluginHostBootstrap
         public string? PickFolder()
         {
             string? result = null;
-            ModBase.RunInUi(() =>
+            ModBase.RunInUiWait(() =>
             {
                 var dialog = new Microsoft.Win32.OpenFolderDialog
                 {
@@ -599,9 +626,9 @@ internal static class PluginHostBootstrap
         public void Log(string message, bool isError = false, Exception? exception = null)
         {
             if (exception is not null)
-                ModBase.Log(exception, message, ModBase.LogLevel.Debug);
+                ModBase.Log(exception, message, isError ? ModBase.LogLevel.Hint : ModBase.LogLevel.Debug);
             else
-                ModBase.Log(message, isError ? ModBase.LogLevel.Debug : ModBase.LogLevel.Debug);
+                ModBase.Log(message, isError ? ModBase.LogLevel.Hint : ModBase.LogLevel.Debug);
         }
     }
 

@@ -1936,7 +1936,7 @@
     <sys:String x:Key="Main.Title.TaskManager">任务管理</sys:String>
     <sys:String x:Key="Main.UpdateLog.Empty">欢迎使用呀~</sys:String>
     <sys:String x:Key="Main.UpdateLog.FullChangelog">完整更新日志</sys:String>
-    <sys:String x:Key="Main.UpdateLog.Title">PCL Swordsman 已更新至 {0} {1}</sys:String>
+    <sys:String x:Key="Main.UpdateLog.Title">PCL Swordsman 已更新至 {0}</sys:String>
     <sys:String x:Key="Main.HomepageReset.Title">主页预设已重置</sys:String>
     <sys:String x:Key="Main.HomepageReset.Content">由于启动器更新，已重置主页预设。请重新前往 设置 - 个性化 选择预设</sys:String>
 
@@ -2506,7 +2506,7 @@
 
     <sys:String x:Key="Setup.About.Downstream.CommunitySource">PCL: CE 源码</sys:String>
     <sys:String x:Key="Setup.About.Downstream.CommunityWebsite">上游官网</sys:String>
-    <sys:String x:Key="Setup.About.Downstream.Feedback">本作已完全禁用反馈功能。PCL Swordsman 是 PCL 社区版的下游项目，请勿向 PCL Community 或上游团队提供任何反馈！如需报告问题，请前往剑客群组服服主团队提供的渠道。</sys:String>
+    <sys:String x:Key="Setup.About.Downstream.Feedback">PCL Swordsman 是 PCL 社区版的下游项目，请勿向 PCL Community 或上游团队提供任何反馈！问题请在 PCL Swordsman 仓库的 Issues（设置 → 反馈）或交流群里反馈。</sys:String>
     <sys:String x:Key="Setup.About.Downstream.Feedback.Title">反馈与支持</sys:String>
     <sys:String x:Key="Setup.About.Downstream.License">本作基于 PCL CE 的源码修改而来，遵循上游项目的开源许可协议（Apache License 2.0 及上游附带的第三方许可，详见下方「许可与版权声明」）。上游代码与相关资源的版权归 PCL Community 与 PCL 原作者龙腾猫跃所有，本作保留上游的全部版权与许可声明，并对下游修改部分承担相应责任。</sys:String>
     <sys:String x:Key="Setup.About.Downstream.License.Title">许可与版权</sys:String>
@@ -2597,6 +2597,8 @@
     <sys:String x:Key="Setup.About.SpecialThanks.OpenWebsite">打开网站</sys:String>
     <sys:String x:Key="Setup.About.SpecialThanks.SponsorMirror">赞助镜像源</sys:String>
     <sys:String x:Key="Setup.About.Team.Title">PCL Swordsman 团队</sys:String>
+    <sys:String x:Key="Setup.About.Group.Title">加入交流群</sys:String>
+    <sys:String x:Key="Setup.About.Group.Button">点我加入PCL Swordsman交流群</sys:String>
     <sys:String x:Key="Setup.About.Team.Name.Jianke">剑客群组服</sys:String>
     <sys:String x:Key="Setup.About.Team.Name.DeepSeek">DeepSeek</sys:String>
     <sys:String x:Key="Setup.About.Team.Info.DeepSeek">一条吃白饭的蓝色大肥鱼，完成了此启动器绝大多数开发任务</sys:String>
@@ -3349,6 +3351,8 @@
   <sys:String x:Key="Preview.Notice.Agree">同意</sys:String>
   <sys:String x:Key="Preview.Notice.Decline">不同意</sys:String>
     <sys:String x:Key="Setup.Update.Unsupported">此版本不支持更新</sys:String>
+    <sys:String x:Key="Setup.Update.Unsupported.Manual">PCL Swordsman 暂不支持自动更新，如要更新，请手动从 GitHub Releases 或交流群下载</sys:String>
+    <sys:String x:Key="Setup.Update.DownloadManual">下载更新</sys:String>
 
     <!-- Setup.Update.Auto -->
 

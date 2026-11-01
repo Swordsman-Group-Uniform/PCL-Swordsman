@@ -1936,7 +1936,7 @@
     <sys:String x:Key="Main.Title.TaskManager">任务管理</sys:String>
     <sys:String x:Key="Main.UpdateLog.Empty">欢迎使用呀~</sys:String>
     <sys:String x:Key="Main.UpdateLog.FullChangelog">完整更新日志</sys:String>
-    <sys:String x:Key="Main.UpdateLog.Title">PCL Swordsman 已更新至 {0} {1}</sys:String>
+    <sys:String x:Key="Main.UpdateLog.Title">PCL Swordsman 已更新至 {0}</sys:String>
     <sys:String x:Key="Main.HomepageReset.Title">主页预设已重置</sys:String>
     <sys:String x:Key="Main.HomepageReset.Content">由于启动器更新，已重置主页预设。请重新前往 设置 - 个性化 选择预设</sys:String>
 
@@ -2597,6 +2597,8 @@
     <sys:String x:Key="Setup.About.SpecialThanks.OpenWebsite">打开网站</sys:String>
     <sys:String x:Key="Setup.About.SpecialThanks.SponsorMirror">赞助镜像源</sys:String>
     <sys:String x:Key="Setup.About.Team.Title">PCL Swordsman 团队</sys:String>
+    <sys:String x:Key="Setup.About.Group.Title">加入交流群</sys:String>
+    <sys:String x:Key="Setup.About.Group.Button">点我加入PCL Swordsman交流群</sys:String>
     <sys:String x:Key="Setup.About.Team.Name.Jianke">剑客群组服</sys:String>
     <sys:String x:Key="Setup.About.Team.Name.DeepSeek">DeepSeek</sys:String>
     <sys:String x:Key="Setup.About.Team.Info.DeepSeek">一条吃白饭的蓝色大肥鱼，完成了此启动器绝大多数开发任务</sys:String>
@@ -3349,6 +3351,8 @@
   <sys:String x:Key="Preview.Notice.Agree">同意</sys:String>
   <sys:String x:Key="Preview.Notice.Decline">不同意</sys:String>
     <sys:String x:Key="Setup.Update.Unsupported">此版本不支持更新</sys:String>
+    <sys:String x:Key="Setup.Update.Unsupported.Manual">PCL Swordsman 暂不支持自动更新，如要更新，请手动从 GitHub Releases 或交流群下载</sys:String>
+    <sys:String x:Key="Setup.Update.DownloadManual">下载更新</sys:String>
 
     <!-- Setup.Update.Auto -->
 

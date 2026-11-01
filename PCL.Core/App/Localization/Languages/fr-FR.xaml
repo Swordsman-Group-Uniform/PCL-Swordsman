@@ -1693,7 +1693,7 @@ Ce que vous pouvez essayer
     <sys:String x:Key="Main.Title.TaskManager">任务管理</sys:String>
     <sys:String x:Key="Main.UpdateLog.Empty">欢迎使用呀~</sys:String>
     <sys:String x:Key="Main.UpdateLog.FullChangelog">完整更新日志</sys:String>
-    <sys:String x:Key="Main.UpdateLog.Title">PCL Swordsman 已更新至 {0} {1}</sys:String>
+    <sys:String x:Key="Main.UpdateLog.Title">PCL Swordsman mis à jour vers {0}</sys:String>
     <sys:String x:Key="Main.HomepageReset.Title">主页预设已重置</sys:String>
     <sys:String x:Key="Main.HomepageReset.Content">由于启动器更新，已重置主页预设。请重新前往 设置 - 个性化 选择预设</sys:String>
     <sys:String x:Key="Main.FileDrag.AuthlibInvalid">输入的 Authlib 验证服务器不符合网址格式（{0}）！</sys:String>
@@ -2258,6 +2258,8 @@ Ce que vous pouvez essayer
     <sys:String x:Key="Setup.About.SpecialThanks.OpenWebsite">打开网站</sys:String>
     <sys:String x:Key="Setup.About.SpecialThanks.SponsorMirror">赞助镜像源</sys:String>
     <sys:String x:Key="Setup.About.Team.Title">PCL Swordsman 团队</sys:String>
+    <sys:String x:Key="Setup.About.Group.Title">Rejoindre la communauté</sys:String>
+    <sys:String x:Key="Setup.About.Group.Button">Cliquez pour rejoindre le groupe PCL Swordsman</sys:String>
     <sys:String x:Key="Setup.About.Team.Name.Jianke">剑客群组服</sys:String>
     <sys:String x:Key="Setup.About.Team.Name.DeepSeek">DeepSeek</sys:String>
     <sys:String x:Key="Setup.About.Team.Info.DeepSeek">一条吃白饭的蓝色大肥鱼，完成了此启动器绝大多数开发任务</sys:String>
@@ -2902,6 +2904,8 @@ Ce que vous pouvez essayer
   <sys:String x:Key="Preview.Notice.Agree">同意</sys:String>
   <sys:String x:Key="Preview.Notice.Decline">不同意</sys:String>
     <sys:String x:Key="Setup.Update.Unsupported">此版本不支持更新</sys:String>
+    <sys:String x:Key="Setup.Update.Unsupported.Manual">PCL Swordsman ne prend pas encore en charge les mises à jour automatiques. Pour mettre à jour, téléchargez-le manuellement depuis GitHub Releases ou le groupe.</sys:String>
+    <sys:String x:Key="Setup.Update.DownloadManual">Télécharger la mise à jour</sys:String>
     <sys:String x:Key="Setup.Update.Auto.Disabled">不自动检查更新（不推荐）</sys:String>
     <sys:String x:Key="Setup.Update.Auto.Disabled.ToolTip">关闭自动更新检查。这可能导致你无法及时获得更新。</sys:String>
     <sys:String x:Key="Setup.Update.Auto.DownloadAndInstall">自动下载并安装更新</sys:String>

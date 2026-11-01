@@ -1879,7 +1879,7 @@
     <sys:String x:Key="Main.Title.TaskManager">任務管理</sys:String>
     <sys:String x:Key="Main.UpdateLog.Empty">歡迎使用呀~</sys:String>
     <sys:String x:Key="Main.UpdateLog.FullChangelog">完整更新紀錄</sys:String>
-    <sys:String x:Key="Main.UpdateLog.Title">PCL Swordsman 已更新至 {0} {1}</sys:String>
+    <sys:String x:Key="Main.UpdateLog.Title">PCL Swordsman 已更新至 {0}</sys:String>
     <sys:String x:Key="Main.HomepageReset.Title">首頁預設已重設</sys:String>
     <sys:String x:Key="Main.HomepageReset.Content">由於啟動器更新，已重設首頁預設。請重新前往 設定 - 個性化 選擇預設</sys:String>
 
@@ -2528,6 +2528,8 @@
     <sys:String x:Key="Setup.About.SpecialThanks.OpenWebsite">開啟網站</sys:String>
     <sys:String x:Key="Setup.About.SpecialThanks.SponsorMirror">贊助鏡像來源</sys:String>
     <sys:String x:Key="Setup.About.Team.Title">PCL Swordsman 團隊</sys:String>
+    <sys:String x:Key="Setup.About.Group.Title">加入交流群</sys:String>
+    <sys:String x:Key="Setup.About.Group.Button">點我加入PCL Swordsman交流群</sys:String>
     <sys:String x:Key="Setup.About.Team.Name.Jianke">劍客群組服</sys:String>
     <sys:String x:Key="Setup.About.Team.Name.DeepSeek">DeepSeek</sys:String>
     <sys:String x:Key="Setup.About.Team.Info.DeepSeek">一條吃白飯的藍色大肥魚，完成了此啟動器絕大多數開發任務</sys:String>
@@ -3252,6 +3254,8 @@
   <sys:String x:Key="Preview.Notice.Agree">同意</sys:String>
   <sys:String x:Key="Preview.Notice.Decline">不同意</sys:String>
     <sys:String x:Key="Setup.Update.Unsupported">此版本不支援更新</sys:String>
+    <sys:String x:Key="Setup.Update.Unsupported.Manual">PCL Swordsman 暫不支援自動更新，如需更新，請手動從 GitHub Releases 或交流群下載</sys:String>
+    <sys:String x:Key="Setup.Update.DownloadManual">下載更新</sys:String>
     <sys:String x:Key="Setup.Feedback.Downstream.Disabled.Title">回饋功能已停用</sys:String>
     <sys:String x:Key="Setup.Feedback.Downstream.Disabled.Message">PCL Swordsman是PCL社群版的下游專案，請勿向社群版團隊提供任何回饋！</sys:String>
     <sys:String x:Key="Setup.Feedback.Downstream.Disabled.Button">回饋功能已停用</sys:String>

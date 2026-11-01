@@ -237,7 +237,11 @@ public sealed class PluginLoader
         // 包格式：以清单 id 找出该插件的**所有**包文件一起改名。
         // 老版本按源文件名安装，同一个插件可能留下多份不同文件名的副本；
         // 只改其中一份会让插件看起来「禁用失败、数量不变」，所以这里必须全改。
-        var packages = PluginPackage.FindPackages(_environment.PluginsDirectory, pluginId);
+        var packages = PluginPackage.FindPackages(_environment.PluginsDirectory, pluginId).ToList();
+        // 共享级目录（%APPDATA%\PCLCE\Plugins）里的包同样要能启停，否则管理页永远「找不到插件包」
+        if (_sharedDirectory is not null)
+            packages.AddRange(PluginPackage.FindPackages(_sharedDirectory, pluginId)
+                .Where(path => !packages.Contains(path, StringComparer.OrdinalIgnoreCase)));
         if (descriptor is { IsPackage: true } || packages.Count > 0)
         {
             if (packages.Count == 0)

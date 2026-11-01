@@ -125,7 +125,8 @@ public static class PluginVersion
             return InRange(actual, lower, upper, out error);
         }
 
-        foreach (var (prefix, mode) in new[] { (">=", 0), ("<=", 1), (">", 2), ("<", 3), ("=", 4), ("==", 4) })
+        // 长前缀必须排在短前缀前面："==" 要在 "=" 之前，否则 "==1.2" 会被当作 "=" + "=1.2" 解析失败
+        foreach (var (prefix, mode) in new[] { ("==", 4), (">=", 0), ("<=", 1), (">", 2), ("<", 3), ("=", 4) })
         {
             if (!spec.StartsWith(prefix, StringComparison.Ordinal))
                 continue;

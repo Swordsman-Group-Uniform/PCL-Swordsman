@@ -137,29 +137,20 @@ public partial class PageSetupLeft
 
     public static void TryFeedback() // Handles ItemFeedback.Click
     {
-        // 本分支已禁用反馈功能
-        if (!ModBase.IsFeedbackSupported)
-        {
-            ModMain.MyMsgBox(Lang.Text("Setup.Feedback.Downstream.Disabled.Message"),
-                Lang.Text("Setup.Feedback.Downstream.Disabled.Title"), Lang.Text("Common.Action.Confirm"));
-            return;
-        }
-
+        // 反馈走本仓库（PCL Swordsman）的 Issues，不再走上游反馈服务
         ModBase.RunInNewThread(() =>
         {
-            if (!ModBase.CanFeedback(true))
-                return;
             switch (ModMain.MyMsgBox(Lang.Text("Setup.Left.Feedback.Message"), Lang.Text("Setup.Left.Feedback.Title"),
                         Lang.Text("Setup.Left.Feedback.SubmitNew"), Lang.Text("Setup.Left.Feedback.ViewList"), Lang.Text("Common.Action.Cancel")))
             {
                 case 1:
                 {
-                    ModBase.Feedback();
+                    ModBase.OpenWebsite("https://github.com/Swordsman-Group-Uniform/PCL-Swordsman/issues/new/choose");
                     break;
                 }
                 case 2:
                 {
-                    ModBase.OpenWebsite("https://github.com/PCL-Community/PCL2-CE/issues/");
+                    ModBase.OpenWebsite("https://github.com/Swordsman-Group-Uniform/PCL-Swordsman/issues");
                     break;
                 }
             }

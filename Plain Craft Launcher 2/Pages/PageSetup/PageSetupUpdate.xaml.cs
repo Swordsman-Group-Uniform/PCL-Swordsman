@@ -39,8 +39,12 @@ public partial class PageSetupUpdate
         CheckUpdate();
     }
 
+    /// <summary>手动下载更新：跳转本仓库的 Releases 页面。</summary>
+    private void BtnDownloadManual_Click(object sender, MouseButtonEventArgs e) =>
+        ModBase.OpenWebsite("https://github.com/Swordsman-Group-Uniform/PCL-Swordsman/releases");
+
     /// <summary>
-    ///     更新功能不可用时的界面状态：隐藏全部更新相关控件，只保留居中的「此版本不支持更新」占位。
+    ///     更新功能不可用时的界面状态：隐藏全部更新相关控件，只保留居中的说明占位 + 版本卡片里的「下载更新」。
     /// </summary>
     private void ShowUnsupportedUI()
     {
@@ -53,9 +57,11 @@ public partial class PageSetupUpdate
         // 更新不可用，但「当前版本」这张卡片保留：显示版本号 + 说明，隐藏两个需要联网 / 上游的操作按钮
         CardCheck.Visibility = Visibility.Visible;
         TextCurrentVersion.Text = VersionNameFormat(ModBase.versionDisplayName);
-        TextCurrentDesc.Text = Lang.Text("Setup.Update.Unsupported");
+        // 版本卡片沿用上游的文案（「已是最新版本」），具体说明放在上方红色占位里
+        TextCurrentDesc.Text = Lang.Text("Setup.Update.Latest");
         BtnCheckAgain.Visibility = Visibility.Collapsed;
         BtnChangelog.Visibility = Visibility.Collapsed;
+        BtnDownloadManual.Visibility = Visibility.Visible;
     }
 
     private async Task<UpdateStatus> IsLatestAsync()

@@ -74,6 +74,9 @@ internal static class ModMaterial
     private static Thickness _originalPanBackMargin = new(10d);
 
 
+    /// <summary>已经挂过尺寸 / 状态事件的窗口（防止重复订阅）。</summary>
+    private static FormMain? _attachedWindow;
+
     /// <summary>上一次下发的窗口外形描述，避免每帧刷日志。</summary>
     private static string? _lastShapeLog;
 
@@ -212,9 +215,11 @@ internal static class ModMaterial
         if (hwnd == nint.Zero) return;
         _hwnd = hwnd;
 
-        // 窗口尺寸 / 状态变化后要重新下发圆角外形（窗口区域是物理像素，不会跟着缩放走）
-        if (ModMain.frmMain is { } window)
+        // 窗口尺寸 / 状态变化后要重新下发圆角外形（窗口区域是物理像素，不会跟着缩放走）。
+        // 同一窗口只挂一次：AttachWindow 可能被重复调用，重复 += 会让处理器成倍叠加。
+        if (_attachedWindow is null && ModMain.frmMain is { } window)
         {
+            _attachedWindow = window;
             window.SizeChanged += (_, _) =>
             {
                 if (_isWindowShaped) ApplyWindowOpacity();
@@ -528,7 +533,10 @@ internal static class ModMaterial
     ///     否则每次启动都会再缩 20px，越缩越小。
     /// </summary>
     public static double WindowSizeCompensation =>
-        _isFullBleed ? Math.Max(_originalPanBackMargin.Left, _originalPanBackMargin.Top) * 2d : 0d;
+        // 最大化 / 最小化时 ResizeWindow 根本没动过尺寸，补回去只会让下次启动偏高偏宽
+        _isFullBleed && ModMain.frmMain?.WindowState is null or WindowState.Normal
+            ? Math.Max(_originalPanBackMargin.Left, _originalPanBackMargin.Top) * 2d
+            : 0d;
 
     /// <summary>
     ///     按当前尺寸下发「界面本体形状」的窗口区域（最大化时不做裁剪，避免顶到屏幕边）。

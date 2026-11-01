@@ -167,7 +167,7 @@
                         Grid.Row="2"
                         Grid.Column="2"
                         Height="35"
-                        local:CustomEventService.EventData="https://github.com/PCL-Community/PCL2-CE"
+                        local:CustomEventService.EventData="https://github.com/Swordsman-Group-Uniform/PCL-Swordsman"
                         local:CustomEventService.EventType="OpenUrl"
                         Text="{DynamicResource Setup.About.SourceCode}" />
                 </Grid>
@@ -192,12 +192,14 @@
                         Info="{DynamicResource Setup.About.Team.Info.DeepSeek}"
                         IsHitTestVisible="False"
                         Title="{DynamicResource Setup.About.Team.Name.DeepSeek}" />
+                    <!-- 「剑客群组服」这一条可点击：跳到 PCL Swordsman 仓库 -->
                     <local:MyListItem
                         Grid.Row="1"
                         Grid.Column="1"
                         Margin="-5,0,15,0"
+                        local:CustomEventService.EventData="https://github.com/Swordsman-Group-Uniform/PCL-Swordsman"
+                        local:CustomEventService.EventType="OpenUrl"
                         Info="{DynamicResource Setup.About.Team.Info.Jianke}"
-                        IsHitTestVisible="False"
                         Title="{DynamicResource Setup.About.Team.Name.Jianke}" />
                     <local:MyListItem
                         Grid.Row="2"
@@ -265,6 +267,18 @@
                                 RadiusY="17" />
                         </Image.Clip>
                     </Image>
+                </Grid>
+            </local:MyCard>
+            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource Setup.About.Group.Title}">
+                <Grid Margin="21,42,21,18">
+                    <local:MyButton
+                        Height="35"
+                        HorizontalAlignment="Left"
+                        ColorType="Highlight"
+                        local:CustomEventService.EventData="https://qun.qq.com/universal-share/share?ac=1&amp;authKey=W9VWHUKKRzP55C1N0teSgRPuOAt6X8rYNUE5i37CN8BuyyxF3zr%2B6QSvdmOJ9ljN&amp;busi_data=eyJncm91cENvZGUiOiI3MzM2MDAxNzEiLCJ0b2tlbiI6InFweWl5SlUrZnVYWkdXZ1RraDB2V0x5cHI3Z0FhczdqcUtGWEluQlhWS2NjYXNDNWYzV0RHNmJzalF5Vk1UcWIiLCJ1aW4iOiIxMzA1MTc3OTIxIn0%3D&amp;data=dUWVUOKT9OX0ouCIqS2OQNzkyLDE_jK03jrOypevWHdoOcRuPlGplOJCBXHP-fzP5CcALYiv7WmR_6T8rhE14g&amp;svctype=4&amp;tempid=h5_group_info"
+                        local:CustomEventService.EventType="OpenUrl"
+                        Padding="18,0"
+                        Text="{DynamicResource Setup.About.Group.Button}" />
                 </Grid>
             </local:MyCard>
             <local:MyCard Margin="0,0,0,15" Title="{DynamicResource Setup.About.SpecialThanks.Title}">

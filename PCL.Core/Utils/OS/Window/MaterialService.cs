@@ -240,8 +240,9 @@ public static partial class MaterialService
         try
         {
             // 用模糊半径与着色强度合成 alpha：半径越大越不透明，最多 0xC0
-            var alpha = (int)Math.Clamp((options.BlurRadius / 40d * 0.55d + options.TintStrength * 0.45d) * tintScale,
-                0d, 0.75d) * 0xC0;
+            // 注意括号：先乘 0xC0 再取整。写成 (int)Clamp(...) * 0xC0 会先截断成 0，着色强度滑块完全无效
+            var alpha = (int)(Math.Clamp((options.BlurRadius / 40d * 0.55d + options.TintStrength * 0.45d) * tintScale,
+                0d, 0.75d) * 0xC0);
             var policy = new AccentPolicy
             {
                 AccentState = AccentEnableBlurBehind,

@@ -273,7 +273,8 @@ internal sealed class AppPluginPermissions : IPluginPermissionHost
     {
         // 弹窗必须回到 UI 线程，而调用方（插件）可能在后台线程：这里阻塞等 UI 线程给出结果
         var granted = false;
-        ModBase.RunInUi(() =>
+        // 必须用【阻塞】版本：RunInUi 是 InvokeAsync，后台线程会立刻读到 granted=false（权限永远拒绝）
+        ModBase.RunInUiWait(() =>
         {
             try
             {

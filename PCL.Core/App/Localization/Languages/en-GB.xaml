@@ -1879,7 +1879,7 @@
     <sys:String x:Key="Main.Title.TaskManager">Task manager</sys:String>
     <sys:String x:Key="Main.UpdateLog.Empty">Welcome!</sys:String>
     <sys:String x:Key="Main.UpdateLog.FullChangelog">Full changelog</sys:String>
-    <sys:String x:Key="Main.UpdateLog.Title">PCL Swordsman has been updated to {0} {1}</sys:String>
+    <sys:String x:Key="Main.UpdateLog.Title">PCL Swordsman updated to {0}</sys:String>
     <sys:String x:Key="Main.HomepageReset.Title">Homepage preset setting has been reset</sys:String>
     <sys:String x:Key="Main.HomepageReset.Content">The homepage preset setting has been reset due to the launcher update.&#xA;Please go to Settings - Personalisation and select the preset again.</sys:String>
 
@@ -2528,6 +2528,8 @@
     <sys:String x:Key="Setup.About.SpecialThanks.OpenWebsite">Website</sys:String>
     <sys:String x:Key="Setup.About.SpecialThanks.SponsorMirror">Sponsor mirror</sys:String>
     <sys:String x:Key="Setup.About.Team.Title">PCL Swordsman team</sys:String>
+    <sys:String x:Key="Setup.About.Group.Title">Join the community</sys:String>
+    <sys:String x:Key="Setup.About.Group.Button">Click to join the PCL Swordsman group chat</sys:String>
     <sys:String x:Key="Setup.About.Team.Name.Jianke">Swordsman server group</sys:String>
     <sys:String x:Key="Setup.About.Team.Name.DeepSeek">DeepSeek</sys:String>
     <sys:String x:Key="Setup.About.Team.Info.DeepSeek">A freeloading blue fat fish that completed most of the development work for this launcher</sys:String>
@@ -3252,6 +3254,8 @@
   <sys:String x:Key="Preview.Notice.Agree">Agree</sys:String>
   <sys:String x:Key="Preview.Notice.Decline">Decline</sys:String>
     <sys:String x:Key="Setup.Update.Unsupported">Updates are not supported in this build</sys:String>
+    <sys:String x:Key="Setup.Update.Unsupported.Manual">PCL Swordsman does not support automatic updates yet. To update, download it manually from GitHub Releases or the group chat.</sys:String>
+    <sys:String x:Key="Setup.Update.DownloadManual">Download update</sys:String>
     <sys:String x:Key="Setup.Feedback.Downstream.Disabled.Title">Feedback disabled</sys:String>
     <sys:String x:Key="Setup.Feedback.Downstream.Disabled.Message">PCL Swordsman is a downstream project of PCL Community Edition. Please do not send any feedback to the upstream PCL Community team!</sys:String>
     <sys:String x:Key="Setup.Feedback.Downstream.Disabled.Button">Feedback is disabled</sys:String>

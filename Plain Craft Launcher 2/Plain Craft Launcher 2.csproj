@@ -126,9 +126,11 @@
         <EmbeddedResource Include="..\plugins\dist\AdvancedMaterials.pclpkg" />
         <!-- 欢迎语：正式版也内置 -->
         <EmbeddedResource Include="..\plugins\dist\Welcome.pclpkg" />
+        <!-- Hello 示例插件：按要求内置（正式版也会随 exe 安装） -->
+        <EmbeddedResource Include="..\plugins\dist\HelloPlugin.pclpkg" />
         <!-- FadedGray 按要求**不随包内置**：只放在 dist/ 供用户手动安装，因此这里显式排除 -->
         <EmbeddedResource Include="..\plugins\dist\*.pclpkg"
-                          Exclude="..\plugins\dist\PCLSCore.pclpkg;..\plugins\dist\AdvancedMaterials.pclpkg;..\plugins\dist\Welcome.pclpkg;..\plugins\dist\FadedGray.pclpkg"
+                          Exclude="..\plugins\dist\PCLSCore.pclpkg;..\plugins\dist\AdvancedMaterials.pclpkg;..\plugins\dist\Welcome.pclpkg;..\plugins\dist\HelloPlugin.pclpkg;..\plugins\dist\FadedGray.pclpkg"
                           Condition="'$(IncludeBundledPlugins)' == 'true'" />
     </ItemGroup>
     <ItemGroup>

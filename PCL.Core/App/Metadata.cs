@@ -79,7 +79,8 @@ public sealed record LauncherVersionModel(
 
     public override string ToString()
     {
-        return $"{BranchName} {BaseName} ({Code}, {CommitDigest})";
+        // 不再带构建分支名（Publish / Debug / CI）：用户要求的版本号前后不要出现 "Publish"
+        return $"{BaseName} ({Code}, {CommitDigest})";
     }
 }
 

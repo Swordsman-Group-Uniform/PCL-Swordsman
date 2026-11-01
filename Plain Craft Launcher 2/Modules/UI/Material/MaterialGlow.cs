@@ -64,8 +64,10 @@ internal static class MaterialGlow
     public static void ClearGlow()
     {
         if (_current is null) return;
-        if (_current.Effect is DropShadowEffect)
+        // 只撤自己写进去的那个实例：控件自带 DropShadowEffect 时不能一并抹掉
+        if (_ownEffect is not null && ReferenceEquals(_current.Effect, _ownEffect))
             _current.Effect = null;
+        _ownEffect = null;
         _current = null;
     }
 
@@ -128,6 +130,9 @@ internal static class MaterialGlow
         _ => false
     };
 
+    /// <summary>我们自己写进控件的那份发光效果（用于精确还原）。</summary>
+    private static DropShadowEffect? _ownEffect;
+
     private static void ApplyGlow(FrameworkElement element)
     {
         if (!ModMaterial.IsGlowEnabled)
@@ -142,7 +147,7 @@ internal static class MaterialGlow
 
         try
         {
-            element.Effect = new DropShadowEffect
+            var effect = new DropShadowEffect
             {
                 Color = AccentColor(element),
                 BlurRadius = ModMaterial.GlowRadius,
@@ -151,6 +156,8 @@ internal static class MaterialGlow
                 Opacity = ModMaterial.GlowOpacity,
                 RenderingBias = RenderingBias.Performance
             };
+            element.Effect = effect;
+            _ownEffect = effect; // 只清自己这份，别抹掉控件自带的阴影
         }
         catch (Exception ex)
         {

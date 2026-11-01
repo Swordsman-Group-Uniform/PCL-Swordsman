@@ -48,20 +48,9 @@ public partial class PageSetupFeedback
 
     private void PageOtherFeedback_Loaded(object sender, RoutedEventArgs e)
     {
-        // 本分支已禁用反馈功能：不请求上游社区的问题列表，仅展示下游声明
-        if (!ModBase.IsFeedbackSupported)
-        {
-            // 反馈功能已禁用：整页只保留居中的红色声明，其余控件全部隐藏
-            HintDownstreamDisabled.Visibility = Visibility.Collapsed;
-            PanInfo.Visibility = Visibility.Collapsed;
-            PanContent.Visibility = Visibility.Collapsed;
-            PanLoad.Visibility = Visibility.Collapsed;
-            PanBlocked.Visibility = Visibility.Visible;
-            PanBack.ScrollToHome();
-            return;
-        }
-
+        // 反馈页已恢复：数据源是本仓库（PCL Swordsman）的 Issues，不再请求上游社区
         HintDownstreamDisabled.Visibility = Visibility.Collapsed;
+        PanBlocked.Visibility = Visibility.Collapsed;
         PageLoaderInit(Load, PanLoad, PanContent, PanInfo, Loader, _ => RefreshList());
         // 重复加载部分
         PanBack.ScrollToHome();
@@ -74,7 +63,7 @@ public partial class PageSetupFeedback
     public void FeedbackListGet(ModLoader.LoaderTask<bool, List<Feedback>> task)
     {
         var list = Requester.FetchJson(
-            "https://api.github.com/repos/PCL-Community/PCL2-CE/issues?state=all&sort=created&per_page=200",
+            "https://api.github.com/repos/Swordsman-Group-Uniform/PCL-Swordsman/issues?state=all&sort=created&per_page=200",
             new RequestParam
             {
                 Retries = 3,

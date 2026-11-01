@@ -314,8 +314,12 @@ public static class PluginPackage
                 if (relative.Length == 0) continue;
 
                 var destination = Path.GetFullPath(Path.Combine(tempRoot, relative));
-                // 防止包内路径穿越
-                if (!destination.StartsWith(tempRoot, StringComparison.OrdinalIgnoreCase)) continue;
+                // 防止包内路径穿越：必须比较「带分隔符的前缀」，
+                // 否则同级兄弟目录（<key>.tmp 与 <key>.tmp-evil）会被判为在根内
+                var rootWithSeparator = tempRoot.EndsWith(Path.DirectorySeparatorChar)
+                    ? tempRoot
+                    : tempRoot + Path.DirectorySeparatorChar;
+                if (!destination.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase)) continue;
 
                 Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
                 entry.ExtractToFile(destination, true);
@@ -393,7 +397,13 @@ public static class PluginPackage
     {
         if (string.IsNullOrEmpty(name)) return name;
         var invalid = Path.GetInvalidFileNameChars();
-        return new string(name.Select(c => invalid.Contains(c) ? '_' : c).ToArray());
+        var cleaned = new string(name.Select(c => invalid.Contains(c) ? '_' : c).ToArray()).Trim();
+
+        // 只允许安全的相对目录名：`.` / `..` 会让数据目录、卸载路径逃出 PCL\Plugins 与 PCL\PluginData
+        if (cleaned is "." or "..") return "_";
+        while (cleaned.Contains("..")) cleaned = cleaned.Replace("..", "_");
+        cleaned = cleaned.Trim('.', ' '); // 结尾的点 / 空格在 Windows 上会被忽略，同样不安全
+        return cleaned.Length == 0 ? "_" : cleaned;
     }
 
     /// <summary>

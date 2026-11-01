@@ -17,6 +17,12 @@ namespace PCL;
 /// </summary>
 internal static class PluginSettingsForm
 {
+    /// <summary>
+    ///     设置项控件统一高度。不设高度时下拉框会缩成默认控件高度（比其它按钮矮一截），
+    ///     视觉上和页面里其它输入框 / 按钮对不齐（用户实测：Hello 插件下拉项、欢迎语来源下拉项都太矮）。
+    /// </summary>
+    private const double ControlHeight = 32d;
+
     /// <summary>一行设置：左边标题 + 说明，右边控件。</summary>
     public static FrameworkElement BuildRow(PluginDescriptor plugin, PluginSettingDefinition definition)
     {
@@ -115,6 +121,7 @@ internal static class PluginSettingsForm
                 var combo = new MyComboBox
                 {
                     Width = 190d,
+                    Height = ControlHeight,
                     VerticalAlignment = VerticalAlignment.Center
                 };
                 combo.ItemsSource = options.Select(option => option.Title).ToList();
@@ -139,19 +146,22 @@ internal static class PluginSettingsForm
 
             case PluginSettingType.Integer when definition.Max is not null:
             {
-                var max = (int)Math.Clamp(definition.Max.Value, 1d, 1000d);
-                var current = (int)Math.Clamp(config.Get(definition.Key, ParseDouble(definition.DefaultValue)), 0d, max);
+                var min = (int)(definition.Min ?? 0d);
+                var max = (int)Math.Max(min + 1, definition.Max.Value);
+                var current = (int)Math.Clamp(config.Get(definition.Key, ParseDouble(definition.DefaultValue)),
+                    min, max);
+                // MySlider 只有 0..MaxValue，所以把插件的 [Min, Max] 映射成 [0, Max-Min] 再偏移回来
                 var slider = new MySlider
                 {
-                    MaxValue = max,
-                    Value = current,
+                    MaxValue = Math.Max(1, max - min),
+                    Value = Math.Clamp(current - min, 0, Math.Max(1, max - min)),
                     Width = 190d,
                     VerticalAlignment = VerticalAlignment.Center
                 };
                 slider.Change += (_, user) =>
                 {
                     if (!user) return;
-                    Save(plugin, definition, () => config.Set(definition.Key, (long)slider.Value));
+                    Save(plugin, definition, () => config.Set(definition.Key, (long)slider.Value + min));
                 };
                 return slider;
             }
@@ -164,6 +174,7 @@ internal static class PluginSettingsForm
                 {
                     Text = current.ToString(CultureInfo.InvariantCulture),
                     Width = 190d,
+                    Height = ControlHeight,
                     VerticalAlignment = VerticalAlignment.Center,
                     HintText = definition.Placeholder ?? ""
                 };
@@ -189,6 +200,7 @@ internal static class PluginSettingsForm
                 {
                     Text = config.Get(definition.Key, definition.DefaultValue ?? ""),
                     Width = 190d,
+                    Height = ControlHeight,
                     VerticalAlignment = VerticalAlignment.Center,
                     HintText = definition.Placeholder ?? ""
                 };

@@ -126,10 +126,10 @@
                                Check="PageCheck"
                                Height="36" VerticalAlignment="Top" Title="{DynamicResource Setup.Left.Item.Update}" Type="RadioBox"
                               SvgIcon="lucide/refresh-cw" />
-            <!-- 本分支已禁用反馈功能：图标沿用上游，禁用状态由页面内红色提示与 ToolTip 表达 -->
+            <!-- 反馈：抓的是本仓库（PCL Swordsman）的 Issues -->
             <local:MyListItem x:Name="ItemFeedback" IsScaleAnimationEnabled="False" Type="RadioBox" Tag="6"
                                Check="PageCheck"
-                               ToolTip="{DynamicResource Setup.Feedback.Downstream.Disabled.Message}" ToolTipService.Placement="Right"
+                               ToolTipService.Placement="Right"
                                ToolTipService.InitialShowDelay="200" ToolTipService.VerticalOffset="-1"
                                MinPaddingRight="35" Height="36" VerticalAlignment="Top" Title="{DynamicResource Setup.Left.Item.Feedback}"
                               LogoScale="0.9"
