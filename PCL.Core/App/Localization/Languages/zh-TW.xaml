@@ -3184,8 +3184,6 @@
     <sys:String x:Key="Setup.Ui.Material.DividerOpacity.ToolTip">側邊欄與主介面之間那條玻璃豎線的亮度；設為 0 即不畫豎線。</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlassRefraction">邊緣折射</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlassRefraction.ToolTip">玻璃邊緣像透鏡一樣把背後的畫面壓縮、位移的強度（單位像素）。這是液態玻璃與一般毛玻璃的關鍵區別；設為 0 就沒有折射，只剩霧化。</sys:String>
-    <sys:String x:Key="Setup.Ui.Material.Win10Blur">允許 Windows 10 舊版霧化</sys:String>
-    <sys:String x:Key="Setup.Ui.Material.Win10Blur.ToolTip">僅 Windows 10 需要勾選：系統沒有可裁剪的視窗材質，只能用舊版模糊。勾選後霧化會依整個視窗矩形繪製，因此會溢出介面之外、四角變方；不勾選則保持介面圓角與貼合，但沒有系統霧化。</sys:String>
   <sys:String x:Key="Setup.Ui.Material.RestartRequired">進階材質的類型改成重新啟動啟動器後生效：目前視窗沿用啟動時的效果，重新啟動後套用新選擇。</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlowRadius">懸停發光半徑</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlowRadius.ToolTip">滑鼠懸停在按鈕、勾選框等控制項上時的發光半徑；設為 0 即關閉懸停發光。</sys:String>

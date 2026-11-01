@@ -58,7 +58,7 @@ public static partial class Config
         ///     Windows 10 上是否允许使用旧版系统磨砂（AccentBlur）。
         ///     该磨砂按窗口矩形绘制、无法裁剪成圆角界面，勾选后磨砂会溢出到界面之外、四角变方。
         /// </summary>
-        [ConfigItem<bool>("UiMaterialAccentBlurOnWin10", false, ConfigSource.Local)] public partial bool MaterialAccentBlurOnWin10 { get; set; }
+
 
         /// <summary>液态玻璃：边缘折射强度（0~30 像素；默认 0 = 只有磨砂，折射需手动开）。</summary>
         [ConfigItem<int>("UiMaterialGlassRefraction", 0, ConfigSource.Local)] public partial int MaterialGlassRefraction { get; set; }

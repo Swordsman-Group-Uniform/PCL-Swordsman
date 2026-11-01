@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Threading;
 using PCL.Core.App;
 using PCL.Core.Logging;
 using PCL.Core.UI.Theme;
@@ -56,6 +57,16 @@ internal static class ModMaterial
     /// <summary>窗口是否已被改成「界面铺满 + 圆角外形」。</summary>
     private static bool _isWindowShaped;
 
+    /// <summary>
+    ///     我们是否真的给窗口设过 `SetWindowRgn` 区域。
+    ///     <para>
+    ///         **只有设过才允许清**：`ClearWindowRegion()` 是 `SetWindowRgn(NULL, 重绘)`，
+    ///         它会强制窗口重画一次非客户区 —— 在 WPF 的 WindowChrome 下这等于把系统标题栏
+    ///         （最小化 / 最大化 / 关闭三键）连同 Basic 主题的窗体一起闪出来。
+    ///     </para>
+    /// </summary>
+    private static bool _shapeRegionApplied;
+
     /// <summary>界面是否已经铺满窗口（见 <c>SetFullBleed</c>）。</summary>
     private static bool _isFullBleed;
 
@@ -65,6 +76,7 @@ internal static class ModMaterial
 
     /// <summary>上一次下发的窗口外形描述，避免每帧刷日志。</summary>
     private static string? _lastShapeLog;
+
 
     /// <summary>上一次生效的材质描述，避免每帧刷日志。</summary>
     private static string? _lastAppliedLog;
@@ -122,13 +134,21 @@ internal static class ModMaterial
     {
         get
         {
-            // 圆角一律按配置来。
-            // 系统磨砂（Win10 的 AccentBlur / Win11 的云母）都是按**整个窗口矩形**绘制的：
-            // 让界面铺满窗口后，磨砂与界面同尺寸，只有四个圆角的小三角里会露出一点磨砂
-            // （用户确认这种「角上模糊」可以接受，换回圆角更重要）。
-            return IsLiquidGlass
-                ? Math.Clamp(Config.System.MaterialGlassCornerRadius, 0, 24)
-                : Math.Clamp(Config.System.WindowCornerRadius, 0, 24);
+            // 没开材质：圆角就是普通窗口的圆角，随设置走
+            if (!IsAvailable || MaterialService.Applied == MaterialKind.None)
+                return IsLiquidGlass
+                    ? Math.Clamp(Config.System.MaterialGlassCornerRadius, 0, 24)
+                    : Math.Clamp(Config.System.WindowCornerRadius, 0, 24);
+
+            // Windows 10：材质生效时**恒为方角**（用户定的规矩，不是 bug）。
+            // 系统 AccentBlur 按整个窗口矩形绘制、不吃 `SetWindowRgn`，圆角只会露在四个小三角里，
+            // 所以 Win10 上干脆不做圆角 —— 界面、玻璃、磨砂统一成方的，调圆角滑块也不生效。
+            if (!DwmInterop.IsBackdropSupported) return 0d;
+
+            // Windows 11：圆角同样写 0，交给 DWM 的窗口圆角去裁。
+            // 这样「实际圆角」与「玻璃圆角」永远是同一条曲线：DWM 先圆角，我们的玻璃 / 描边 / 折射环
+            // 都是方的、被这条圆角裁出来 —— 不管 DPI 缩放多少（DWM 的半径是物理像素，猜数字一定对不上）。
+            return 0d;
         }
     }
 
@@ -145,8 +165,8 @@ internal static class ModMaterial
             var radius = CornerRadius;
             if (_isWindowShaped)
             {
-                // 窗口区域负责圆角 → 内容不再自己裁，否则圆角三角里会露出没上色的磨砂
-                SetContentCornerRadius(frm, UpdateWindowRegion(frm, radius) ? 0d : radius);
+                // 材质生效：Win10 方角、Win11 由 DWM 圆角 —— 内容都不再自己裁
+                SetContentCornerRadius(frm, 0d);
             }
             else
             {
@@ -315,16 +335,42 @@ internal static class ModMaterial
 
         // 系统磨砂（Win10 的 AccentBlur / Win11 的云母·亚克力）都按**整个窗口矩形**绘制，
         // 而界面默认内缩 10px（PanBack.Margin）：那圈 10px 的磨砂就会露在界面外面 =「边框比启动器大」。
-        // 所以材质生效时让界面铺满窗口（Margin=0），磨砂区域与界面**完全重合**；
-        // 圆角照旧由窗口区域裁，四个角上会有一点磨砂（已知且可接受）。
+        // 所以材质生效时让界面铺满窗口（Margin=0），磨砂区域与界面**完全重合**。
         SetFullBleed(frm, true);
 
-        // 圆角由配置决定：普通模式默认 6（上游值），液态玻璃默认 16（可在个性化页调）。
-        // 圆角由**窗口区域**裁：内容自己再裁一次的话，四个圆角的小三角里会露出没上色的系统磨砂，
-        // 看起来就像「边框上糊了一层透明膜」。只有区域设置失败时才退回内容裁剪。
-        var radius = CornerRadius;
-        var regionApplied = UpdateWindowRegion(frm, radius);
-        SetContentCornerRadius(frm, regionApplied ? 0d : radius);
+        // ── Windows 11（22621+）：圆角交给 DWM ──────────────────────────────
+        // 关键：DWM 的云母 / 亚克力会**跟着 DWM 的窗口圆角走**，所以让系统自己圆角即可，
+        // 千万不要再自己设窗口区域（`SetWindowRgn` 会把 DWM 圆角关掉，而系统材质又不吃区域，
+        // 于是磨砂铺满整个矩形 = Win11 上的「模糊溢出」）。
+        if (DwmInterop.IsBackdropSupported)
+        {
+            // 只清「我们自己设过」的区域（新流程从不设，所以这里基本是空操作）。
+            // 绝不无条件清区域：那是 `SetWindowRgn(NULL, 重绘)`，会重画非客户区 = 系统三键 + Basic 窗体闪现。
+            ClearShapeRegionIfNeeded();
+
+            // Win11 的圆角必须自己开：
+            // WPF 的 WindowChrome 窗口在系统眼里是弹窗样式，`DWMWCP_DEFAULT` 判定为**不圆角**，
+            // 只有显式设 `Round` 才会被 DWM 圆角裁（这也解释了为什么删掉这句就变成直角）。
+            // 只调这一句、不碰非客户区，因此不会有闪烁。
+            EnsureSystemRoundedCorners();
+
+            // 圆角完全交给 DWM：内容自己一律不裁（裁两次会在圆角处形成两层边）。
+            // 玻璃描边 / 折射环的 CornerRadius 也取 0，靠这条系统圆角裁出来，两者必然同曲率。
+            SetContentCornerRadius(frm, 0d);
+            frm.ResizeOffsetWpf = 6;
+            LogShape("DWM 圆角（Win11：系统材质与玻璃都被同一条 DWM 圆角裁出，不会溢出、也不会对不齐）");
+            return;
+        }
+
+        // ── Windows 10：一律方角 ─────────────────────────────────────────────
+        // 旧版 AccentBlur 由 DWM 按整个窗口矩形绘制、不吃窗口区域（用户日志已证实：
+        // 区域设成 (10,10)-(890,540) 也照样铺满整窗）。既然磨砂一定是方的，
+        // 就让界面也保持方角，两者完全重合，圆角滑块在 Win10 上不再生效。
+        ClearShapeRegionIfNeeded();
+
+        frm.ResizeOffsetWpf = 0;
+        SetContentCornerRadius(frm, 0d);
+        LogShape("方角（Win10：系统磨砂按整个窗口矩形绘制，界面与之完全重合）");
     }
 
     /// <summary>设置内容自身的圆角裁剪（窗口区域裁好时传 0，避免和区域叠成两层）。</summary>
@@ -370,14 +416,46 @@ internal static class ModMaterial
         if (_hwnd == nint.Zero) return;
         try
         {
-            WindowInterop.ClearWindowRegion(_hwnd);
-            DwmInterop.TrySetWindowCornerPreference(_hwnd, DwmInterop.WindowCornerPreference.Default);
+            ClearShapeRegionIfNeeded();
             LogShape("矩形窗口（未启用材质）");
         }
         catch (Exception ex)
         {
             LogWrapper.Warn("Material", "恢复窗口外形失败：" + ex.Message);
         }
+    }
+
+    /// <summary>Win11 是否已经打开过 DWM 圆角（只设一次，避免每次重申请都调一遍 DWM）。</summary>
+    private static bool _systemRoundEnabled;
+
+    /// <summary>
+    ///     打开 DWM 窗口圆角（Win11 22621+）。
+    ///     <para>
+    ///         WPF 的 WindowChrome 窗口用 `DWMWCP_DEFAULT` 会被判定成弹窗、**不圆角**，
+    ///         必须显式设 `Round`。这个调用只改 DWM 属性，不触发 `WM_NCCALCSIZE` / 非客户区重画，
+    ///         所以不会闪系统标题栏；而且只在第一次调。
+    ///     </para>
+    /// </summary>
+    private static void EnsureSystemRoundedCorners()
+    {
+        if (_systemRoundEnabled || _hwnd == nint.Zero) return;
+        if (DwmInterop.TrySetWindowCornerPreference(_hwnd, DwmInterop.WindowCornerPreference.Round))
+        {
+            _systemRoundEnabled = true;
+            LogWrapper.Info("Material", "已启用 DWM 窗口圆角（Win11：材质与玻璃都由这条系统圆角裁出）");
+        }
+    }
+
+    /// <summary>
+    ///     只在我们确实设过窗口区域时才清掉它（见 <see cref="_shapeRegionApplied" /> 的说明）。
+    ///     没设过就什么都不做 —— 空清一次会强制重画非客户区，把系统三键和 Basic 主题窗体闪出来。
+    /// </summary>
+    private static void ClearShapeRegionIfNeeded()
+    {
+        if (!_shapeRegionApplied || _hwnd == nint.Zero) return;
+        _shapeRegionApplied = false;
+        WindowInterop.ClearWindowRegion(_hwnd);
+        LogWrapper.Info("Material", "已清除窗口区域（恢复系统默认外形）");
     }
 
     /// <summary>
@@ -480,6 +558,7 @@ internal static class ModMaterial
 
             if (WindowInterop.SetClientAreaRoundedRegion(_hwnd, radiusPx, insetPx))
             {
+                _shapeRegionApplied = true;
                 // 缩放热区必须落在区域内部：区域从 inset 处开始
                 frm.ResizeOffsetWpf = (int)Math.Round(insetDip);
 
@@ -535,7 +614,8 @@ internal static class ModMaterial
             GlassOpacity = Math.Clamp(Config.System.MaterialGlassOpacity, 10, 100) / 100d,
             GlassTitleOpacity = Math.Clamp(Config.System.MaterialGlassTitleOpacity, 0, 100) / 100d,
             GlassRefraction = Math.Clamp(Config.System.MaterialGlassRefraction, 0, 30),
-            AllowLegacyAccentBlur = Config.System.MaterialAccentBlurOnWin10,
+            // Win10 只有一个可用实现：系统级 AccentBlur（DWM 绘制，四角会溢出，见 ApplyWindowShape 的说明）
+            AllowLegacyAccentBlur = true,
             DividerOpacity = Math.Clamp(Config.System.MaterialDividerOpacity, 0, 100) / 100d,
             PillOpacity = Math.Clamp(Config.System.MaterialPillOpacity, 30, 100) / 100d,
             DialogOpacity = Math.Clamp(Config.System.MaterialDialogOpacity, 30, 100) / 100d,

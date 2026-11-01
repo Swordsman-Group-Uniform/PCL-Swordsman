@@ -196,10 +196,7 @@
                             <local:MySlider Grid.Column="1" x:Name="SliderMaterialCardOpacity" Tag="UiMaterialCardOpacity" MaxValue="70" ValueByKey="5"
                                             ToolTip="{DynamicResource Setup.Ui.Material.CardOpacity.ToolTip}" Change="MaterialSliderChange" />
                         </Grid>
-                        <local:MyCheckBox x:Name="CheckMaterialWin10Blur" Text="{DynamicResource Setup.Ui.Material.Win10Blur}"
-                                          Height="24" Margin="-1,2,0,4" Visibility="Collapsed"
-                                          ToolTip="{DynamicResource Setup.Ui.Material.Win10Blur.ToolTip}"
-                                          Change="MaterialWin10Blur_Change" />
+
                         <Grid Height="32">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="Name1" />

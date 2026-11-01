@@ -3266,8 +3266,6 @@
     <sys:String x:Key="Setup.Ui.Material.DividerOpacity.ToolTip">Brightness of the glass line between the sidebar and the main area; set it to 0 to hide the line.</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlassRefraction">Edge refraction</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlassRefraction.ToolTip">How strongly the glass edge bends the backdrop like a lens, in pixels. This is what separates liquid glass from plain frosted glass; set it to 0 for frosting only.</sys:String>
-    <sys:String x:Key="Setup.Ui.Material.Win10Blur">Allow legacy Windows 10 blur</sys:String>
-    <sys:String x:Key="Setup.Ui.Material.Win10Blur.ToolTip">Windows 10 only: the system has no clip-able window material, so only the legacy blur is available. Enabling it draws the blur across the whole window rectangle, so it spills outside the rounded interface and the corners become square; leaving it off keeps the rounded, fitted interface but without system blur.</sys:String>
   <sys:String x:Key="Setup.Ui.Material.RestartRequired">Material type changes take effect after restarting the launcher: this window keeps the effect it started with.</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlowRadius">Hover glow radius</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlowRadius.ToolTip">Glow radius when hovering buttons, check boxes and similar controls; set it to 0 to turn the hover glow off.</sys:String>

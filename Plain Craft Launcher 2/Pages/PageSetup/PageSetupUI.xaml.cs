@@ -881,7 +881,6 @@ public partial class PageSetupUI
         SliderMaterialPillOpacity.Value =
             Math.Clamp(Config.System.MaterialPillOpacity, 30, 100) - MaterialOpacitySliderOffset;
         SliderMaterialDividerOpacity.Value = Math.Clamp(Config.System.MaterialDividerOpacity, 0, 100);
-        CheckMaterialWin10Blur.Checked = Config.System.MaterialAccentBlurOnWin10;
         SliderMaterialGlowRadius.Value = Math.Clamp(Config.System.MaterialGlowRadius, 0, 20);
         SliderMaterialGlowOpacity.Value = Math.Clamp(Config.System.MaterialGlowOpacity, 0, 100);
         RefreshMaterialLayout();
@@ -899,7 +898,6 @@ public partial class PageSetupUI
         PanMaterialOpaque.Visibility = isGlass ? Visibility.Collapsed : Visibility.Visible;
         // 「Windows 10 旧版磨砂」在 snapshot-72 起是**默认且唯一**的 Win10 实现（界面铺满窗口、磨砂与界面等大），
         // 不再由用户勾选，所以这一项直接隐藏，免得让人以为关掉还有别的磨砂可用
-        CheckMaterialWin10Blur.Visibility = Visibility.Collapsed;
         PanMaterialGlass.Visibility = isGlass ? Visibility.Visible : Visibility.Collapsed;
         LabGlassHint.Visibility = isGlass ? Visibility.Visible : Visibility.Collapsed;
         CardMaterial.TriggerForceResize();
@@ -1006,13 +1004,6 @@ public partial class PageSetupUI
         if (index != (int)ModMaterial.Kind)
             HintService.Hint(Lang.Text("Setup.Ui.Material.RestartRequired"), HintType.Info);
         RefreshMaterialLayout();
-        RefreshMaterialStatus();
-    }
-
-    private void MaterialWin10Blur_Change(object senderRaw, bool user)
-    {
-        if (ModAnimation.AniExitsAnyControl()) return;
-        SetByTag("UiMaterialAccentBlurOnWin10", CheckMaterialWin10Blur.Checked == true);
         RefreshMaterialStatus();
     }
 

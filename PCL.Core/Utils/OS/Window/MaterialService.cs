@@ -106,6 +106,7 @@ public static partial class MaterialService
     private const uint SwpNoSize = 0x0001;
     private const uint SwpNoMove = 0x0002;
     private const uint SwpNoZorder = 0x0004;
+    private const uint SwpNoActivate = 0x0010;
     private const uint SwpFrameChanged = 0x0020;
     private const uint RdwInvalidate = 0x0001;
     private const uint RdwAllChildren = 0x0080;
@@ -250,6 +251,7 @@ public static partial class MaterialService
                 GradientColor = (alpha << 24) | 0x1A1A1A // AABBGGRR，深色着色
             };
 
+
             var size = Marshal.SizeOf<AccentPolicy>();
             var buffer = Marshal.AllocHGlobal(size);
             try
@@ -261,7 +263,9 @@ public static partial class MaterialService
                     Data = buffer,
                     SizeOfData = size
                 };
-                return SetWindowCompositionAttribute(hwnd, ref data);
+                var ok = SetWindowCompositionAttribute(hwnd, ref data);
+                if (ok) _dwmTouched = true; // 设过磨砂，关掉时才需要重绘
+                return ok;
             }
             finally
             {
@@ -274,6 +278,9 @@ public static partial class MaterialService
             return false;
         }
     }
+
+    /// <summary>本进程是否真的向系统设过磨砂（只有设过才需要在关掉时重绘）。</summary>
+    private static bool _dwmTouched;
 
     private static bool _ClearAero(IntPtr hwnd)
     {
@@ -322,11 +329,22 @@ public static partial class MaterialService
 
         try
         {
+            // 启动时本来就没有材质：**什么都不要做**。
+            // 一旦走到下面的 ForceRepaint（SWP_FRAMECHANGED / RDW_FRAME），
+            // WPF 的 WindowChrome 窗口会被强制重画非客户区 —— 系统三键 + Basic 主题窗体闪一帧。
+            if (!_dwmTouched && Applied == MaterialKind.None && AppliedVia is null)
+            {
+                FallbackReason = null;
+                ForcesSquareCorners = false;
+                return;
+            }
+
             var cleared = _ClearAero(hwnd);
             if (!cleared) _ClearAero(hwnd); // 个别 build 第一次不生效，补一发（幂等）
 
             DwmInterop.TrySetBackdropType(hwnd, DwmInterop.BackdropType.None);
             ForceRepaint(hwnd);
+            _dwmTouched = false;
 
             var hadMaterial = Applied != MaterialKind.None || AppliedVia is not null;
             Applied = MaterialKind.None;
@@ -343,14 +361,20 @@ public static partial class MaterialService
         }
     }
 
-    /// <summary>让窗口强制重新合成一次（撤掉磨砂后立刻生效，不用等用户拖窗口）。</summary>
+    /// <summary>
+    ///     让窗口强制重新合成一次（撤掉磨砂后立刻生效，不用等用户拖窗口）。
+    ///     <para>
+    ///         **不能带 `SWP_FRAMECHANGED` / `RDW_FRAME`**：WPF 用 WindowChrome 让客户区铺满整个窗口，
+    ///         强制重算 / 重画非客户区会把系统标题栏（最小化 / 最大化 / 关闭）和 Basic 主题窗体闪出来。
+    ///     </para>
+    /// </summary>
     private static void ForceRepaint(IntPtr hwnd)
     {
         try
         {
             SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0,
-                SwpNoMove | SwpNoSize | SwpNoZorder | SwpFrameChanged);
-            RedrawWindow(hwnd, IntPtr.Zero, IntPtr.Zero, RdwInvalidate | RdwFrame | RdwAllChildren | RdwUpdateNow);
+                SwpNoMove | SwpNoSize | SwpNoZorder | SwpNoActivate);
+            RedrawWindow(hwnd, IntPtr.Zero, IntPtr.Zero, RdwInvalidate | RdwAllChildren | RdwUpdateNow);
             DwmFlush();
         }
         catch

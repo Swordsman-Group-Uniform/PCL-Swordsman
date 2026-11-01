@@ -2796,8 +2796,6 @@
     <sys:String x:Key="Setup.Ui.Material.DividerOpacity.ToolTip">侧边栏与主界面之间那条玻璃竖线的亮度；设为 0 即不画竖线。</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlassRefraction">边缘折射</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlassRefraction.ToolTip">玻璃边缘像透镜一样把背后的画面压缩、位移的强度（单位像素）。这是液态玻璃与普通毛玻璃的关键区别；设为 0 就没有折射，只剩磨砂。</sys:String>
-    <sys:String x:Key="Setup.Ui.Material.Win10Blur">允许 Windows 10 旧版磨砂</sys:String>
-    <sys:String x:Key="Setup.Ui.Material.Win10Blur.ToolTip">仅 Windows 10 需要勾选：系统没有可裁剪的窗口材质，只能用旧版模糊。勾选后磨砂会按整个窗口矩形绘制，因此会溢出到界面之外、四角变方；不勾选则保持界面圆角与贴合，但没有系统磨砂。</sys:String>
   <sys:String x:Key="Setup.Ui.Material.RestartRequired">高级材质的类型改成了重启启动器后生效：当前窗口沿用启动时的效果，重启后按新选择应用。</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlowRadius">悬停发光半径</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlowRadius.ToolTip">鼠标悬停在按钮、勾选框等控件上时的发光半径；设为 0 即关闭悬停发光。</sys:String>
