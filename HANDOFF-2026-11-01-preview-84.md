@@ -1,4 +1,4 @@
-# 交接文档 · 2026-11-01 · snapshot-83
+# 交接文档 · 2026-11-01 · preview-84
 
 > 上一份：`HANDOFF-2026-10-31-preview-73.md`（preview-73 时代，部分内容已被本轮推翻，**以本文为准**）。
 > 更早的 `HANDOFF-2026-10-31.md`（snapshot-71）、`HANDOFF-2026-10-29.md`、`HANDOVER.md` 均已过期。
@@ -8,8 +8,8 @@
 ## 0. 三十秒看懂
 
 * 项目：**PCL Swordsman**（`PCLCE For SGU`），PCL CE 的下游分支，C# / WPF / net10.0-windows。
-* 当前版本：**`27.1-snapshot-83(2.15.1)`，code 606**。
-* 产物：`dist/PCLCE For SGU 27.1-snapshot-83(2.15.1).exe`（25,738,093 B）。
+* 当前版本：**`27.1-preview-84(2.15.1)`，code 607**（由 snapshot-83 转预发布，代码无差异）。
+* 产物：`dist/PCLCE For SGU 27.1-preview-84(2.15.1).exe`（25,738,093 B，SHA-256 `49aab141…552ece`）。
 * 开发机：Android / Termux 交叉构建；测试机：Windows 10 **21H2 build 19044**（用户口述为 22H2，日志实测 19044）。
 * 仓库：`Swordsman-Group-Uniform/PCL-Swordsman`（公开，`main`），上传用 SSH key `~/.ssh/id_ed25519_pcls`。
 * **本轮主题**：把"自绘背景模糊"整条路线删掉，材质回到 DWM；Win10 固定方角，Win11 交给 DWM 圆角。
@@ -30,6 +30,7 @@
 | snapshot-81 | Win11 玻璃圆角取 0，交给 DWM 圆角裁（解决"实际圆角与玻璃圆角不一致"） | ✅ 思路正确 |
 | snapshot-82 | 修「系统三键闪现 + Basic 主题窗体」：不再碰非客户区 | ⚠️ 顺手删掉了 Win11 的 `Round` → 变成直角 |
 | snapshot-83 | 恢复 `DWMWA_WINDOW_CORNER_PREFERENCE = Round`（只设一次，不碰非客户区） | 待用户实机验收 |
+| preview-84 | 转预发布，代码与 snapshot-83 一致（功能自 snapshot-79 冻结） | 待验收 |
 
 ---
 
@@ -105,7 +106,7 @@ powershell -ExecutionPolicy Bypass -File tools\build.ps1
 
 `Plain Craft Launcher 2/metadata.json` → `version.suffix` + `version.code`。
 开发期 `snapshot-NN`，功能冻结转 `preview-NN`，`rc-NN`，正式版无 suffix。
-**code 跨阶段连续递增**（本轮 596 → 606）。改完记得同步 `CHANGELOG.md`。
+**code 跨阶段连续递增**（本轮 596 → 607）。改完记得同步 `CHANGELOG.md`。
 
 ### 3.4 本地化
 
