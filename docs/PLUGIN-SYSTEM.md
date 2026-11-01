@@ -1,6 +1,6 @@
 # PCL2 插件化改造技术方案（PCLCE For SGU）
 
-> **内部设计文档**：含主题机制等内部实现细节，**不随社区文档发行**（对外只发 `PLUGIN-API.md` / `PLUGIN-GUIDE.md`）。
+> **设计文档**：含主题机制等实现细节，与 `PLUGIN-API.md` / `PLUGIN-GUIDE.md` / `PLUGIN-DEV.md` 配套阅读。
 
 > 状态：**设计稿（v0.1）**　适用范围：本下游分支
 > 目标读者：接手维护者、插件开发者

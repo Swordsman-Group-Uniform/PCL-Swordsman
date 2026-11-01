@@ -510,7 +510,7 @@ System.Windows.Markup.XamlParseException: 无法从文本“BtnSettingsClose_Cli
 ## snapshot-59 → 60：插件页面 API + 插件自带主题（Faded灰） + 对外文档去掉主题内容
 
 > 用户三连：「插件系统…前两个」→「继续做第三项」→「测试新主题：Faded灰…主题要内置到插件『Faded灰主题』中。
-> 主题API可以开放给社区，但是API文档中不能提及任何主题相关内容（内部的可以，对外发行的不行）」。
+> 主题 API 已完全开放，`docs/PLUGIN-THEMES.md` 也已并入公开文档。
 > 前两条对应的改动（依赖/版本、事件总线、插件设置界面）见 snapshot-58；本条目是**第三项 + Faded灰主题 + 文档隔离**。
 
 ### ① 插件页面 API（`IPluginUiProvider`）
@@ -546,14 +546,14 @@ System.Windows.Markup.XamlParseException: 无法从文本“BtnSettingsClose_Cli
 
 ### ③ 对外文档去掉一切主题相关内容
 
-- 用户要求：**主题 API 可以开放给社区（技术上可用），但对外发行的 API 文档不得提及任何主题相关内容**
+- 当时的用户要求：主题 API 可以开放（技术上可用），但对外文档不提主题 —— **该限制已于 2026-11-01 取消**
 - `docs/PLUGIN-API.md` **整篇重写**：去掉 `themes.extended`、`IExtraThemesProvider`、`PluginThemeDefinition`、
   主题槽位白名单、`ThemeRead` 能力、主题排错行，连 `ThemeChangedEvent` 也移除（属于主题相关内容）；
   同时把依赖/版本/事件/设置/页面这些**新能力**补齐
 - `docs/PLUGIN-GUIDE.md` 同样清空主题相关段落，改成「想提供数据/界面就实现这些接口」的表格（不含主题）
-- 主题机制全部挪进 **`docs/internal/PLUGIN-THEMES.md`（内部文档，不对外发行）**：
+- 主题机制全部挪进 **`docs/PLUGIN-THEMES.md`**（2026-11-01 起已公开）：
   两套主题接口的区别、插件主题链路表、标题栏装饰约定、槽位对照、配色分派、**对外文档隔离自检清单**
-- `docs/PLUGIN-SYSTEM.md` 顶部加「内部设计文档，不随社区文档发行」标记
+- `docs/PLUGIN-SYSTEM.md` 顶部的保密标记已于 2026-11-01 移除
 - 自检：`grep -in "theme\|主题" docs/PLUGIN-API.md docs/PLUGIN-GUIDE.md` **无输出**
 
 - 版本号：`27.1-snapshot-60(2.15.1)`，`code` 583，26,531,693 B，

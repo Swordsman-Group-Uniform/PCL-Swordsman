@@ -402,5 +402,3 @@ Plain Craft Launcher 2/Images/Particles/
 # 用户提供的成品图（Faded 主题装饰图，由使用者自行放置）
 plugins/FadedGray/Faded.jpg
 
-# 内部文档：不进公开仓库
-docs/internal/PLUGIN-DEV.md

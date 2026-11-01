@@ -648,7 +648,7 @@ tar -xzf "_downloads\PCL-CE-<tag>.tar.gz" -C "_upstream\<tag>" --strip-component
   `ColorTheme.PluginDefined = 16`，具体 id 存在 `UiLightPluginTheme` / `UiDarkPluginTheme`；
   `CreateTitleDecoration` 给标题栏装饰，宿主放进 `PanTitlePluginDecoration`。
 - **文档隔离（用户硬要求）**：主题相关内容**只能**写内部文档
-  （`docs/internal/PLUGIN-THEMES.md`、`HANDOVER.md`、`DOWNSTREAM-CHANGES.md`）；
+  （`docs/PLUGIN-THEMES.md`、`HANDOVER.md`、`DOWNSTREAM-CHANGES.md`）；
   `docs/PLUGIN-API.md` / `docs/PLUGIN-GUIDE.md` 里不得出现 `theme` / `主题` 字样
   （包括 `ThemeChangedEvent`）。改完自检：`grep -in "theme\|主题" docs/PLUGIN-API.md docs/PLUGIN-GUIDE.md` 必须无输出。
 - 现成例子：`plugins/SguPack`（页面）、`plugins/FadedGray`（自带主题 `Faded灰` + 内嵌 `Faded.jpg` 装饰）。

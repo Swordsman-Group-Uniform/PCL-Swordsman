@@ -126,7 +126,7 @@ XAML 里换行必须写 `&#10;`。增删键后各文件计数必须一致。
 | 系统三键闪出来 / Basic 窗体闪一下 | 有人碰了非客户区（`SWP_FRAMECHANGED`、`RDW_FRAME`、无条件 `ClearWindowRegion`） |
 | Win11 变直角 | `DWMWA_WINDOW_CORNER_PREFERENCE = Round` 没设上（看日志 `已启用 DWM 窗口圆角`） |
 | 材质切换没反应 | 材质**类型**是进程内锁定的（`_lockedKind`），改类型要重启；参数是即时的 |
-| 插件页报 `XamlParseException` | 事件签名不对，见 `docs/internal/PLUGIN-DEV.md` §19.2 |
+| 插件页报 `XamlParseException` | 事件签名不对，见 `docs/PLUGIN-DEV.md` §19.2 |
 | 组件崩了想回滚 | `git log --oneline` 找 snapshot 边界，`dist/` 里有历史 exe |
 
 **铁律：任何"已修好"的结论都必须有日志证据。** 本轮前三次"修好了"全靠猜，全错。
@@ -159,12 +159,12 @@ XAML 里换行必须写 `&#10;`。增删键后各文件计数必须一致。
 * `PCL.PluginHost/` —— 发现 / 清单 / ALC / 生命周期 / 权限 / 完整性 / 安装 / 更新。
 * `Plain Craft Launcher 2/Modules/Plugins/` —— 启动器侧接线（Bootstrap / Services / Update / SettingsForm / Welcome）。
 * `Plain Craft Launcher 2/Pages/PageTools/PageToolsPluginManage.xaml(.cs)` —— 插件管理页。
-* `docs/internal/PLUGIN-DEV.md` —— **本轮新写的插件开发完整文档**（22 章，含主题与签名）。
-* `docs/internal/PLUGIN-THEMES.md` —— 主题内部细节。
+* `docs/PLUGIN-DEV.md` —— 插件开发完整文档（22 章，含主题与签名）。
+* `docs/PLUGIN-THEMES.md` —— 主题机制细节。
 
 ### 文档
 `README.md`（双语）、`README-FIRST.md`（§0.0 公开仓库故意没有的两样东西）、`CHANGELOG.md`、
-`DOWNSTREAM-CHANGES.md`、`VERSIONING.md`、`docs/*.md`（面向社区，**不能提主题**）、`docs/internal/*.md`。
+`DOWNSTREAM-CHANGES.md`、`VERSIONING.md`、`docs/*.md`（含 `PLUGIN-DEV.md` / `PLUGIN-THEMES.md`）。
 
 ---
 
@@ -200,7 +200,7 @@ XAML 里换行必须写 `&#10;`。增删键后各文件计数必须一致。
 * 原版素材**不入公开仓库**（`.gitignore` 排除 `Images/Blocks/NetherWartBlock.png`、
   `Images/Particles/`、`plugins/FadedGray/Faded.jpg` 等）；本地构建缺这些文件时 FadedGray 的
   csproj 用了 `Condition="Exists('Faded.jpg')"`。
-* 公开文档不能提主题（见开头）；主题内部文档只在 `docs/internal/`。
+* 主题文档已公开（`docs/PLUGIN-THEMES.md`），不再是保留内容。
 * 工作区根目录属主是 `root`，push 前已加过 `git config --global safe.directory`。
 * 插件部署按**版本号比较**：同版本编辑不会传播到用户机器，改内置插件内容必须升版本号。
 
@@ -211,4 +211,4 @@ XAML 里换行必须写 `&#10;`。增删键后各文件计数必须一致。
 **材质这块别再折腾"自绘/截屏"路线，Win10 方角是既定需求，Win11 用 DWM 圆角；
 任何要动窗口非客户区的代码都先看本文 §2.1 第 3 条。**
 剩下的主要工程是插件市场（M5），插件 SDK 已经稳定在 API 1，开发细节全在
-`docs/internal/PLUGIN-DEV.md`。
+`docs/PLUGIN-DEV.md`。

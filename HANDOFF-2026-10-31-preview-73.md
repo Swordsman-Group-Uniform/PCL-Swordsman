@@ -1,5 +1,7 @@
 # 交接书 —— PCL Swordsman（PCL CE 下游分支）
 
+> **历史文档**：内容对应 preview-73。文中的「主题不能写进公开文档」约束已于 2026-11-01 取消，
+> 主题文档现在是 `docs/PLUGIN-THEMES.md`。
 > 交接时间：**2026-10-31** 晚，快照 **preview-73**（`code` 596）。
 > 上一份：`HANDOFF-2026-10-31.md`（snapshot-71 时点）；更早：`HANDOFF-2026-10-29.md`、`HANDOFF-2026-10-25.md`。
 > **本文档是当前状态的唯一入口**。面向用户的更新日志看 `CHANGELOG.md`，逐版工程记录看 `DOWNSTREAM-CHANGES.md`，
@@ -57,7 +59,7 @@
 5. 更新 / 自动更新 / 云控公告已在代码层禁用，不要重新打开
 6. 联机是 EasyTier 纯 P2P，不得引入依赖 PCL 中继 / 大厅服务器的实现
 7. **对外文档不得出现任何主题相关内容**：`docs/PLUGIN-API.md` / `docs/PLUGIN-GUIDE.md` 里
-   `grep -in "theme\|主题"` 必须为 0；主题只写在 `docs/internal/PLUGIN-THEMES.md` 与 `HANDOVER.md`
+   `grep -in "theme\|主题"` 必须为 0；主题只写在 `docs/PLUGIN-THEMES.md` 与 `HANDOVER.md`
 
 ---
 
@@ -295,7 +297,7 @@ CHANGELOG.md ★                     面向用户的更新日志
 | **`CHANGELOG.md`** | 面向用户的更新日志（按里程碑，不写 bug） |
 | `DOWNSTREAM-CHANGES.md` | 逐快照工程记录（**最新在最上面**，含产物哈希与验证项） |
 | `HANDOVER.md` | 百科：每个子系统的设计、历史与坑 |
-| `docs/internal/PLUGIN-THEMES.md` | 内部主题机制（勿对外） |
+| `docs/PLUGIN-THEMES.md` | 内部主题机制（勿对外） |
 | `docs/PLUGIN-API.md` / `docs/PLUGIN-GUIDE.md` | 对外插件接口 / 教程（不含主题内容） |
 | `docs/PLUGIN-SYSTEM.md` | 插件化设计稿 + 里程碑（M0–M4 完成） |
 | `VERSIONING.md` | 版本号规范（**preview 阶段名已定稿**） |

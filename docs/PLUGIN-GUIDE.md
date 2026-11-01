@@ -1,7 +1,8 @@
 # 插件制作指南（PCLCE For SGU）
 
-> 面向：想给启动器写插件的人 · 契约 API v1 · 适用 `27.1-snapshot-23(2.15.1)` 及以后
-> 接口细节看 [`PLUGIN-API.md`](PLUGIN-API.md)；本文件只讲「怎么做出一个能用的包」。
+> 面向：想给启动器写插件的人 · 契约 API v1 · 适用 `27.1(2.15.2)` 及以后
+> 接口细节看 [`PLUGIN-API.md`](PLUGIN-API.md)，进阶与内部机制看 [`PLUGIN-DEV.md`](PLUGIN-DEV.md)、
+> 主题扩展看 [`PLUGIN-THEMES.md`](PLUGIN-THEMES.md)；本文件只讲「怎么做出一个能用的包」。
 
 ---
 

@@ -1,7 +1,10 @@
 # 插件接口参考（PCLCE For SGU）
 
-> 适用版本：`27.1-snapshot-59(2.15.1)` 及以后 · 契约 API 版本 **1**
-> 相关文档：[`PLUGIN-GUIDE.md`](PLUGIN-GUIDE.md)（怎么做插件）、[`PLUGIN-SYSTEM.md`](PLUGIN-SYSTEM.md)（内部设计笔记，**不随社区文档发行**）
+> 适用版本：`27.1(2.15.2)` 及以后 · 契约 API 版本 **1**
+> 相关文档：[`PLUGIN-GUIDE.md`](PLUGIN-GUIDE.md)（怎么做插件）、
+> [`PLUGIN-DEV.md`](PLUGIN-DEV.md)（开发全流程细节）、
+> [`PLUGIN-THEMES.md`](PLUGIN-THEMES.md)（主题扩展机制）、
+> [`PLUGIN-SYSTEM.md`](PLUGIN-SYSTEM.md)（设计说明）
 
 本文写清楚三件事：
 
