@@ -187,6 +187,12 @@
                     <Canvas x:Name="PanTitlePetals" IsHitTestVisible="False" Width="260" Height="48"
                             HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,96,0"
                             ClipToBounds="True" Visibility="Collapsed" />
+                    <!-- 「肥鱼蓝」主题的装饰：右上角低透明度的肥鱼像（原图白底已抠成透明） -->
+                    <Image x:Name="ImgTitleFatFish" IsHitTestVisible="False" Opacity="0.30" Height="46"
+                           HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,96,0"
+                           Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"
+                           Visibility="Collapsed"
+                           Source="/Plain Craft Launcher 2;component/Images/fatfish.png" />
                     <!-- 「甲基橙」主题的装饰：右上角的甲基橙化学式 C14H14N3NaO3S
                          —— 像素字是自绘进 png 的，**没有**为它内嵌任何字体文件 -->
                     <Image x:Name="ImgTitleFormula" IsHitTestVisible="False" Opacity="0.22" Height="30"
