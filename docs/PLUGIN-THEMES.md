@@ -69,19 +69,40 @@ public sealed class PluginCustomThemeDefinition
 `ColorTheme`（`PCL.Core/App/ConfigEnums.cs`）：
 `SkyBlue=0`、`CatBlue=1`、`DeathBlue=2`、`HmclBlue=3`、`Custom=4`、`FatFishBlue=5`、`TianyiBlue=6`、
 `SwordsmanYellow=7`、`MikuGreen=8`、`MermanBlue=9`、`KaoYinGreen=10`、`IchikaBlue=11`、
-`SakuraPink=12`、`NetherRed=13`、`MethylOrange=14`、`AmethystPurple=15`、**`PluginDefined=16`**。
+`SakuraPink=12`、`NetherRed=13`、`MethylOrange=14`、`AmethystPurple=15`、`PluginDefined=16`、
+`LiuliGlass=17`、`ObsidianBlack=18`、`HoneyYellow=19`、`SlimeGreen=20`。
+
+> 17~20 是 snapshot-86 新增的四个「原版贴图主题」：琉璃彩（三块大玻璃 + 逐帧彩色渐变，四层不透明度锁 30%）、
+> 曜石黑、蜂蜜黄、黏液绿（后三个把原版方块贴图平铺在标题栏上）。它们都要求启用扩展主题功能键。
 
 配色分派（`ThemeService._CalculateColors`）：
 
 ```
 剑客黄 / golden-dusk flavor      → _CalculateColorsGoldenDusk（黄昏金渐变）
 樱花粉 / sakura-bloom flavor     → _CalculateColorsSakuraBloom（樱粉 → 梅紫）
+蜂蜜黄 / honey-amber flavor      → _CalculateColorsHoneyAmber（#FADE29 → #EA8E16 → #D56B2B）
+黏液绿 / slime-gel flavor        → _CalculateColorsSlimeGel（#7BCE6A → #73C262 → #5AAA43）
+琉璃彩 / liuli-prism flavor      → _CalculateColorsLiuliPrism（玻璃青 → 蓝紫 → 品红棱镜）
+曜石黑 / obsidian-void flavor    → _CalculateColorsObsidianVoid（紫黑 → 纯黑）
 其余十六进制主题（含 PluginDefined）→ _CalculateColorsFromHex（按档位加权，主色精确等于指定色）
 上游预设主题                      → _CalculateColorsDefault
 ```
 
 **新增主题槽位时必查**：`GetCurrentThemeArgs()` 的 switch（少一个 case 会在 Release 下抛
-`IndexOutOfRangeException`）、`IsHexTheme()`、`IsBlueTheme()`、`PageSetupUI.ThemeColors` 的显示名 case。
+`IndexOutOfRangeException`）、`IsHexTheme()`、`IsBlueTheme()`、`PageSetupUI.ThemeColors` 的显示名 case、
+以及 8 个语言文件里的主题名键（键数必须齐平）。
+
+## 3.1 深浅色主题已合并（snapshot-86）
+
+以前浅色 / 深色各选一套配色（`UiLightColor` / `UiDarkColor`），现在设置页只有**一个**「配色主题」下拉：
+
+- **浅色槽位是唯一事实来源**：`ThemeService.CurrentTheme` 只读 `UiLightColor`，
+  写的时候同时镜像到 `UiDarkColor`（插件与旧文档还会读深色槽位，所以保留）。
+- 插件主题 id 同理：只认 `UiLightPluginTheme`，`CurrentPluginThemeId` 不再按深浅色分支。
+- 旧版本升级迁移：`ThemeService.SyncMergedThemeSlots()` 在启动时把浅色槽位同步进深色槽位
+  （**旧版只读取浅色主题的选项**），日志里会写 `[Theme] 深浅色主题已合并：…`。
+- 插件写入主题**请走** `ThemeService.SetCurrentThemeSelection(theme, pluginThemeId)`，
+  直接写 `Config.Preference.Theme.DarkColor` 会被下一次同步覆盖。
 
 ## 4. 与「对外文档」的隔离检查
 

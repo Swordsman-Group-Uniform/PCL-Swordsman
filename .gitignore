@@ -399,7 +399,20 @@ liquid-glass-main/
 Plain Craft Launcher 2/Images/Blocks/NetherWartBlock.png
 Plain Craft Launcher 2/Images/Blocks/AmethystBlock.png
 Plain Craft Launcher 2/Images/Particles/
+# snapshot-86 四个新主题用的原版贴图（琉璃彩 / 曜石黑 / 蜂蜜黄 / 黏液绿）
+Plain Craft Launcher 2/Images/Blocks/Glass.png
+Plain Craft Launcher 2/Images/Blocks/GlassPaneTop.png
+Plain Craft Launcher 2/Images/Blocks/Obsidian.png
+Plain Craft Launcher 2/Images/Blocks/CryingObsidian.png
+Plain Craft Launcher 2/Images/Blocks/HoneycombBlock.png
+Plain Craft Launcher 2/Images/Blocks/Honeycomb.png
+Plain Craft Launcher 2/Images/Blocks/BeeNestSide.png
+Plain Craft Launcher 2/Images/Blocks/BeehiveSide.png
+Plain Craft Launcher 2/Images/Blocks/SlimeBlock.png
 
 # 用户提供的成品图（Faded 主题装饰图，由使用者自行放置）
 plugins/FadedGray/Faded.jpg
+
+# 原版客户端 jar（42 MB，仅供 tools/extract-vanilla-textures.py 本地抽取，绝不入库）
+/*.jar
 

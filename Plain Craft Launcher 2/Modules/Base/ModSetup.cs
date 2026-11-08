@@ -142,31 +142,17 @@ public class ModSetup
     {
         try
         {
-            var changed = false;
-
-            var light = Config.Preference.Theme.LightColor;
-            if (!ThemeService.IsThemeSelectable(light) || IsMissingPluginTheme(light,
+            // 深浅色主题已合并：只有浅色槽位是真正的选择，深色槽位由 ThemeService 镜像，
+            // 所以这里只需校验一次、回退时一次写两个槽位
+            var theme = Config.Preference.Theme.LightColor;
+            if (ThemeService.IsThemeSelectable(theme) && !IsMissingPluginTheme(theme,
                     Config.Preference.Theme.LightPluginTheme))
-            {
-                Config.Preference.Theme.LightColor = ColorTheme.CatBlue;
-                Config.Preference.Theme.LightPluginTheme = "";
-                ModBase.Log($"[Theme] 浅色主题 {light} 已不可选（扩展主题功能未启用或插件主题已卸载），回退到龙猫蓝",
-                    ModBase.LogLevel.Normal);
-                changed = true;
-            }
+                return;
 
-            var dark = Config.Preference.Theme.DarkColor;
-            if (!ThemeService.IsThemeSelectable(dark) || IsMissingPluginTheme(dark,
-                    Config.Preference.Theme.DarkPluginTheme))
-            {
-                Config.Preference.Theme.DarkColor = ColorTheme.CatBlue;
-                Config.Preference.Theme.DarkPluginTheme = "";
-                ModBase.Log($"[Theme] 深色主题 {dark} 已不可选（扩展主题功能未启用或插件主题已卸载），回退到龙猫蓝",
-                    ModBase.LogLevel.Normal);
-                changed = true;
-            }
-
-            if (changed) ThemeManager.ThemeRefresh();
+            ThemeService.SetCurrentThemeSelection(ColorTheme.CatBlue, null);
+            ModBase.Log($"[Theme] 主题 {theme} 已不可选（扩展主题功能未启用或插件主题已卸载），回退到龙猫蓝",
+                ModBase.LogLevel.Normal);
+            ThemeManager.ThemeRefresh();
         }
         catch (Exception ex)
         {

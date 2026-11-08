@@ -129,23 +129,43 @@
                     <!--     </LinearGradientBrush> -->
                     <!-- </Grid.Background> -->
                     <local:MyImage x:Name="ImgTitle" IsHitTestVisible="False" Stretch="UniformToFill" IsEnabled="False" RenderOptions.BitmapScalingMode="LowQuality" />
+                    <!-- 贴图类主题的标题栏装饰：贴图**由代码加载**（ModTitleTextures），不再写死 ImageSource。
+                         Images/Blocks 下是原版美术资源、不进公开仓库，干净 clone 里这些文件不存在，
+                         写死 pack URI 会让 InitializeComponent 抛异常（整个窗口都起不来）；
+                         现在缺哪张就少哪一层，其余照常工作。 -->
                     <!-- 「下界红」主题的装饰：整条标题栏铺一层低透明度的**原版**地狱疣块贴图
                          （贴图取自原版客户端 jar：assets/minecraft/textures/block/nether_wart_block.png，
                           16×16 原尺寸平铺，不做插值放大） -->
-                    <Rectangle x:Name="RectTitleNether" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.28">
-                        <Rectangle.Fill>
-                            <ImageBrush ImageSource="/Plain Craft Launcher 2;component/Images/Blocks/NetherWartBlock.png"
-                                        TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" Stretch="Fill" />
-                        </Rectangle.Fill>
-                    </Rectangle>
+                    <Rectangle x:Name="RectTitleNether" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.28" />
                     <!-- 「水晶紫」主题的装饰：整条标题栏铺一层低透明度的**原版**紫水晶块贴图
                          （assets/minecraft/textures/block/amethyst_block.png，16×16 原尺寸平铺） -->
-                    <Rectangle x:Name="RectTitleAmethyst" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.28">
-                        <Rectangle.Fill>
-                            <ImageBrush ImageSource="/Plain Craft Launcher 2;component/Images/Blocks/AmethystBlock.png"
-                                        TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" Stretch="Fill" />
-                        </Rectangle.Fill>
-                    </Rectangle>
+                    <Rectangle x:Name="RectTitleAmethyst" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.28" />
+                    <!-- 「曜石黑」：黑曜石铺满，右侧 20% 换成哭泣黑曜石（16×16 原尺寸平铺） -->
+                    <Grid x:Name="GridTitleObsidian" IsHitTestVisible="False" Visibility="Collapsed"
+                          SnapsToDevicePixels="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.8*" />
+                            <ColumnDefinition Width="0.2*" />
+                        </Grid.ColumnDefinitions>
+                        <Rectangle x:Name="RectTitleObsidian" Grid.Column="0" Opacity="0.34" />
+                        <Rectangle x:Name="RectTitleCryingObsidian" Grid.Column="1" Opacity="0.34" />
+                    </Grid>
+                    <!-- 「蜂蜜黄」：蜂巢侧面 10% + 蜂巢块 40% + 蜜脾 40% + 蜂箱侧面 10%（两个侧面贴图只出现在两端） -->
+                    <Grid x:Name="GridTitleHoney" IsHitTestVisible="False" Visibility="Collapsed"
+                          SnapsToDevicePixels="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.1*" />
+                            <ColumnDefinition Width="0.4*" />
+                            <ColumnDefinition Width="0.4*" />
+                            <ColumnDefinition Width="0.1*" />
+                        </Grid.ColumnDefinitions>
+                        <Rectangle x:Name="RectTitleBeeNest" Grid.Column="0" Opacity="0.30" />
+                        <Rectangle x:Name="RectTitleHoneycombBlock" Grid.Column="1" Opacity="0.30" />
+                        <Rectangle x:Name="RectTitleHoneycomb" Grid.Column="2" Opacity="0.30" />
+                        <Rectangle x:Name="RectTitleBeehive" Grid.Column="3" Opacity="0.30" />
+                    </Grid>
+                    <!-- 「黏液绿」：整条标题栏铺一层原版黏液块贴图 -->
+                    <Rectangle x:Name="RectTitleSlime" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.30" />
                     <!-- 「剑客黄」主题的装饰：黄昏圣光渐变 -->
                     <Border x:Name="RectTitleGolden" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.62">
                         <Border.Background>

@@ -3152,6 +3152,7 @@
 
     <sys:String x:Key="Setup.Ui.Material.Title">進階材質（視窗）</sys:String>
     <sys:String x:Key="Setup.Ui.Material.Hint">為視窗啟用進階材質：雲母、Aero 模糊或液態玻璃。標題列、主介面、側邊欄、卡片的不透明度可以分別調節；系統不支援所選效果時會自動降級。</sys:String>
+    <sys:String x:Key="Setup.Ui.Material.LiuliLocked">琉璃彩主題鎖定標題列 / 主介面 / 側邊欄 / 卡片的不透明度為 30%，不可調整。</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlassCorner">玻璃圓角</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlassCorner.ToolTip">液態玻璃模式下整片玻璃的圓角大小（0~24）。</sys:String>
     <sys:String x:Key="Setup.Ui.Material.Effect">材質效果</sys:String>
@@ -3223,6 +3224,10 @@
     <sys:String x:Key="Setup.Ui.Theme.Color.NetherRed">下界紅</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.MethylOrange">甲基橙</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.AmethystPurple">水晶紫</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Honey">蜂蜜黃</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Liuli">琉璃彩</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Obsidian">曜石黑</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Slime">黏液綠</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.MikuGreen">初音綠</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.MermanBlue">海人藍</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.FatFishBlue">肥魚藍</sys:String>
@@ -3272,6 +3277,7 @@
     <sys:String x:Key="Setup.About.Downstream.CommunitySource">PCL: CE 原始碼</sys:String>
     <sys:String x:Key="Setup.About.Downstream.OriginalProject">PCL 原作</sys:String>
     <sys:String x:Key="Setup.About.Downstream.CommunityWebsite">上游官網</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color">配色主題</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Title">主題</sys:String>
 
     <!-- Setup.Update -->

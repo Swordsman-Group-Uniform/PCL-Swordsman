@@ -3,9 +3,38 @@
 本分支基于 **PCL: CE（Plain Craft Launcher Community Edition）** 源码二次开发，
 版本号规则见 [`VERSIONING.md`](VERSIONING.md)。
 
-当前版本：**27.1-preview-73(2.15.1)**
+当前版本：**27.1.1-snapshot-86(2.15.2)**
 
 > 括号外为下游版本号，括号内为**标注用的**上游版本号（**不追上游同步**，见 `HANDOVER.md` §0.19 / §4.1）。
+
+## snapshot-86：四个原版贴图主题 + 深浅色主题合并
+
+> 用户原话：「加入以下新主题：①琉璃彩…②曜石黑…③蜂蜜黄…④黏液绿…把深浅色主题合并到一起，
+> 不再分开选择。旧版启动器升级的话只读取浅色主题的选项。」
+
+- 版本号 `27.1.1-snapshot-86(2.15.2)`，`code` 612；8 个语言文件各 **3389** 键（新增 6 个键）。
+- **`ColorTheme` 新增 4 个槽位**（接在 `PluginDefined=16` 之后，不动已有编号）：
+  `LiuliGlass=17` / `ObsidianBlack=18` / `HoneyYellow=19` / `SlimeGreen=20`；
+  都在「扩展主题」功能键之下，配色走新的逐档渐变 ramp（`_CalculateColorsHoneyAmber` /
+  `…SlimeGel` / `…LiuliPrism` / `…ObsidianVoid`），并同步登记进 `IsHexTheme()`。
+- **取色口径**：曜石黑 `#100C1C`（黑曜石主体色）；蜂蜜黄 `#FADE29 → #EA8E16 → #D56B2B`（蜜脾三色）；
+  黏液绿按 **alpha 加权**重算（黏液块大面积半透明，`alpha ≥ 200` 口径为空）得
+  `#7BCE6A` 13.7% / `#73C262` 50.0% / `#5AAA43` 7.4%；琉璃彩取玻璃三色 `#D0EAE9 / #8BC1CD / #A8D0D9`。
+- **标题栏贴图**：新增 `ModTitleTextures`（运行时加载 16×16 平铺 `ImageBrush`，带同色棋盘兜底），
+  下界红 / 水晶紫也从「XAML 写死 pack URI」迁过来 —— 干净 clone 里缺贴图不会再让 `InitializeComponent` 抛异常。
+  曜石黑 = 黑曜石 + 右侧 20% 哭泣黑曜石；蜂蜜黄 = 蜂巢侧面 10% + 蜂巢块 40% + 蜜脾 40% + 蜂箱侧面 10%；
+  黏液绿 = 黏液块铺满。
+- **琉璃彩**：新增 `Modules/UI/Material/ModLiuliGlass.cs`。三块大玻璃（标题栏 / 侧边栏 / 主界面），
+  内部铺原版 `Glass.png`、四周 8px 用 `GlassPaneTop.png`（不透明度 60%）、
+  玻璃内部小粒子（2~5 px，上限 40%）铺满整窗；主题色是动态彩色渐变 ——
+  45 fps 定时器每帧只重写 13 个画刷颜色（3 块玻璃 × 3 个色标 + 4 个粒子画刷），色相沿 OKLCH 96 秒转一圈，
+  不重建资源字典、不走 `ThemeService` 全量刷新。四层不透明度在 `ModMaterial` 里**锁定 30%**，
+  设置页四个滑条禁用并显示 `Setup.Ui.Material.LiuliLocked` 说明。
+- **深浅色主题合并**：设置页两个下拉合并成一个「配色主题」（新键 `Setup.Ui.Theme.Color`）；
+  `ThemeService.CurrentTheme` / `CurrentPluginThemeId` 只读浅色槽位、写入时镜像深色槽位；
+  启动时 `SyncMergedThemeSlots()` 把浅色同步进深色（**旧版升级只读取浅色主题**），日志写
+  `[Theme] 深浅色主题已合并：…`。插件请改用 `ThemeService.SetCurrentThemeSelection(theme, id)`。
+- 语言键：`Setup.Ui.Theme.Color.{Liuli,Obsidian,Honey,Slime}`、`Setup.Ui.Theme.Color`、`Setup.Ui.Material.LiuliLocked`。
 
 ## preview-73：转入预发布阶段（阶段名 pre → preview）
 

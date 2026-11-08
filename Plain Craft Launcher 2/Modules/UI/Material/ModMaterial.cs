@@ -84,6 +84,9 @@ internal static class ModMaterial
     /// <summary>上一次生效的材质描述，避免每帧刷日志。</summary>
     private static string? _lastAppliedLog;
 
+    /// <summary>琉璃彩「没有系统材质」提示只打一次（避免每次刷新都刷一行）。</summary>
+    private static string? _lastLiuliLog;
+
     /// <summary>功能是否可用（由插件声明 <c>materials.advanced</c> 决定）。</summary>
     public static bool IsAvailable => FeatureFlags.IsEnabled(FeatureFlags.Keys.MaterialsAdvanced);
 
@@ -250,6 +253,12 @@ internal static class ModMaterial
     }
 
     /// <summary>
+    ///     「琉璃彩」主题锁定的四层不透明度（标题栏 / 主界面 / 侧边栏 / 卡片）。
+    ///     用户明确要求锁 30%，设置页对应的滑条会被禁用（不再生效）。
+    /// </summary>
+    public const double LiuliGlassOpacity = 0.30d;
+
+    /// <summary>
     ///     重新应用四层表面的不透明度：标题栏 / 主界面 / 侧边栏 / 卡片。
     ///     主题刷新换过画刷后必须调用，否则透明度会被主题配色吃掉。
     /// </summary>
@@ -267,7 +276,16 @@ internal static class ModMaterial
                 ModWallpaperFrost.Clear();
 
             double titleFactor, mainFactor, sidebarFactor, cardFactor;
-            if (materialOn && IsLiquidGlass)
+            // 「琉璃彩」：整个启动器透明化，四层不透明度**锁定 30%**（用户要求，滑条在设置页被禁用）。
+            // 不论材质类型与滑条怎么设，这一条都优先 —— 否则主题看上去就不是「琉璃」了。
+            if (ThemeService.CurrentTheme == ColorTheme.LiuliGlass)
+            {
+                titleFactor = LiuliGlassOpacity;
+                mainFactor = LiuliGlassOpacity;
+                sidebarFactor = LiuliGlassOpacity;
+                cardFactor = LiuliGlassOpacity;
+            }
+            else if (materialOn && IsLiquidGlass)
             {
                 // 液态玻璃：整个窗口是一块玻璃 —— 标题栏默认没有独立底色（0 = 与玻璃连成一片），
                 // 但允许单独加一点标题栏底色（UiMaterialGlassTitleOpacity，默认 0）
@@ -287,6 +305,19 @@ internal static class ModMaterial
             ApplyTitleOpacity(frm, titleFactor);
             ApplyMainOpacity(frm, mainFactor);
             ApplySurfaceOpacity(frm, sidebarFactor, cardFactor);
+
+            // 琉璃彩锁 30% 时如果压根没有系统材质，窗口后面就没有「被糊住的桌面」，
+            // 看上去会偏暗 —— 这是预期行为（用户要求的不透明度锁定），但日志里要说清楚，
+            // 免得下次排查时把它当成透明度失效
+            if (ThemeService.CurrentTheme == ColorTheme.LiuliGlass && !materialOn)
+            {
+                const string liuliLog = "琉璃彩：系统材质未生效，界面仍按 30% 不透明度叠加（观感偏暗属预期）";
+                if (_lastLiuliLog != liuliLog)
+                {
+                    _lastLiuliLog = liuliLog;
+                    LogWrapper.Info("Material", liuliLog);
+                }
+            }
 
             // 玻璃圆角 / 竖线 / 小玻璃（非玻璃模式时自己会还原）
             ModLiquidGlass.Refresh();

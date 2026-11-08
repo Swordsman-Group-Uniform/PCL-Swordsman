@@ -61,10 +61,12 @@ public sealed partial class ThemeService
         trigger: ConfigEvent.Update,
         handler: e =>
         {
-            // ignore no change or non-current color theme change
+            // ignore no change
             if (e.OldValue == e.Value) return;
-            if (IsDarkMode) { if (e.Item == Config.Preference.Theme.LightColorConfig) return; }
-            else { if (e.Item == Config.Preference.Theme.DarkColorConfig) return; }
+            // 深浅色主题已合并（snapshot-86）：配色只有一个选择，统一以**浅色槽位**为准；
+            // 深色槽位只是镜像写入（见 CurrentTheme 的 setter），不再单独触发刷新，
+            // 否则一次切换会连刷两遍配色与标题栏装饰。
+            if (e.Item == Config.Preference.Theme.DarkColorConfig) return;
             // trigger color refresh
             if (Lifecycle.CurrentState > LifecycleState.Loading)
             {
@@ -81,9 +83,47 @@ public sealed partial class ThemeService
     [LifecycleStart]
     private static void _Start()
     {
+        SyncMergedThemeSlots();
         IsDarkMode = _IsDarkMode();
         _LogStatus();
         _RefreshAll();
+    }
+
+    /// <summary>
+    ///     深浅色主题合并后的迁移：把**浅色槽位**的值镜像到深色槽位。
+    ///     <para>
+    ///         旧版本（snapshot-85 及以前）允许分别选浅色 / 深色的配色主题；现在只留一个选择，
+    ///         旧启动器升级上来时**只读取浅色主题的选项**，深色跟随它。
+    ///         对已经合并过的配置这是一次空操作（两个槽位本来就相等）。
+    ///     </para>
+    /// </summary>
+    public static void SyncMergedThemeSlots()
+    {
+        try
+        {
+            var theme = Config.Preference.Theme;
+            var changed = false;
+
+            if (theme.DarkColor != theme.LightColor)
+            {
+                var previousDark = theme.DarkColor;
+                theme.DarkColor = theme.LightColor;
+                changed = true;
+                Context.Info($"[Theme] 深浅色主题已合并：深色配色由 {previousDark} 改为跟随浅色配色的 {theme.LightColor}");
+            }
+
+            if (!string.Equals(theme.DarkPluginTheme, theme.LightPluginTheme, StringComparison.Ordinal))
+            {
+                theme.DarkPluginTheme = theme.LightPluginTheme;
+                changed = true;
+            }
+
+            if (changed) Context.Info("[Theme] 旧版配置迁移完成：只保留了一个配色主题选择（旧版升级只读取浅色主题）");
+        }
+        catch (Exception ex)
+        {
+            Context.Warn("同步深浅色主题槽位失败：" + ex.Message);
+        }
     }
 
     private static void _LogStatus()
@@ -197,13 +237,16 @@ public sealed partial class ThemeService
 
     /// <summary>
     ///     当前生效的插件主题 id（不是插件主题时返回 null）。
+    ///     <para>
+    ///         深浅色主题已合并：插件主题 id 同样只认**浅色槽位**，深色槽位由
+    ///         <see cref="SyncMergedThemeSlots" /> 镜像同步。
+    ///     </para>
     /// </summary>
     public static string? CurrentPluginThemeId
     {
         get
         {
-            var theme = Config.Preference.Theme;
-            var id = IsDarkMode ? theme.DarkPluginTheme : theme.LightPluginTheme;
+            var id = Config.Preference.Theme.LightPluginTheme;
             return string.IsNullOrWhiteSpace(id) ? null : id;
         }
     }
@@ -225,7 +268,10 @@ public sealed partial class ThemeService
             : fallback;
     }
 
-    /// <summary>取主题的特殊配色风格（<c>golden-dusk</c> / <c>sakura-bloom</c>）。</summary>
+    /// <summary>
+    ///     取主题的特殊配色风格（<c>golden-dusk</c> / <c>sakura-bloom</c> / <c>honey-amber</c> /
+    ///     <c>slime-gel</c> / <c>liuli-prism</c> / <c>obsidian-void</c>）。
+    /// </summary>
     private static string? _ThemeFlavor(ColorTheme theme)
     {
         if (theme == ColorTheme.PluginDefined)
@@ -315,21 +361,39 @@ public sealed partial class ThemeService
     public static ToneProfile CurrentTone => IsDarkMode ? ToneProfiles.Dark : ToneProfiles.Light;
 
     /// <summary>
-    /// 当前使用的主题色。
+    ///     当前使用的主题色。
+    ///     <para>
+    ///         深浅色主题已在 snapshot-86 合并为一个选择：取值只认**浅色槽位**，
+    ///         赋值时把深色槽位一起镜像过去（插件与旧文档仍可能读 <c>UiDarkColor</c>）。
+    ///     </para>
     /// </summary>
     public static ColorTheme CurrentTheme
     {
-        get
-        {
-            var theme = Config.Preference.Theme;
-            return IsDarkMode ? theme.DarkColor : theme.LightColor;
-        }
+        get => Config.Preference.Theme.LightColor;
         set
         {
             var theme = Config.Preference.Theme;
-            var config = IsDarkMode ? theme.DarkColorConfig : theme.LightColorConfig;
-            config.SetValue(value);
+            // 先写深色槽位再写浅色槽位：浅色槽位的配置事件才是触发刷新的那一个
+            if (theme.DarkColor != value) theme.DarkColor = value;
+            theme.LightColor = value;
         }
+    }
+
+    /// <summary>
+    ///     一次性写入合并后的主题选择（槽位 + 插件主题 id，深浅两个槽位同步写）。
+    ///     <para>
+    ///         先写插件主题 id 再写槽位：<c>SetByTag</c> / 配置写入会立刻触发主题刷新事件，
+    ///         事件里（标题栏装饰）要能读到新的 id。
+    ///     </para>
+    /// </summary>
+    public static void SetCurrentThemeSelection(ColorTheme theme, string? pluginThemeId)
+    {
+        var config = Config.Preference.Theme;
+        var id = theme == ColorTheme.PluginDefined ? pluginThemeId ?? "" : "";
+
+        if (!string.Equals(config.DarkPluginTheme, id, StringComparison.Ordinal)) config.DarkPluginTheme = id;
+        if (!string.Equals(config.LightPluginTheme, id, StringComparison.Ordinal)) config.LightPluginTheme = id;
+        CurrentTheme = theme;
     }
 
     /// <summary>
@@ -358,6 +422,14 @@ public sealed partial class ThemeService
             ColorTheme.NetherRed => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.NetherRed, "#B3392E"), (30d, 0d, 0d)),
             ColorTheme.MethylOrange => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.MethylOrange, "#EE7B1E"), (55d, 0d, 0d)),
             ColorTheme.AmethystPurple => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.AmethystPurple, "#9A5CE0"), (300d, 0d, 0d)),
+            // 琉璃彩：取原版玻璃的三色中间值 #A8D0D9 作基准色族，界面上的流动渐变由宿主逐帧另算
+            ColorTheme.LiuliGlass => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.LiuliGlass, "#A8D0D9"), (205d, 0.1d, 0.05d)),
+            // 曜石黑：取原版黑曜石的主体色 #100C1C（比纯黑有层次）
+            ColorTheme.ObsidianBlack => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.ObsidianBlack, "#100C1C"), (285d, -0.6d, -0.4d)),
+            // 蜂蜜黄：取蜜脾三色的中间色 #EA8E16（两端 #FADE29 / #D56B2B 由色阶渐变补出来）
+            ColorTheme.HoneyYellow => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.HoneyYellow, "#EA8E16"), (62d, 0d, 0d)),
+            // 黏液绿：取黏液块的主色 #73C262（按 alpha 加权统计）
+            ColorTheme.SlimeGreen => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.SlimeGreen, "#73C262"), (140d, 0d, 0d)),
             ColorTheme.PluginDefined => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.PluginDefined, "#5C5C5C"), (255d, 0d, -0.2d)),
 #if DEBUG
             _ => ((double)theme, 0, 0)
@@ -462,8 +534,9 @@ public sealed partial class ThemeService
 
     /// <summary>
     ///     计算当前主题的 11 个彩色资源。
-    ///     「剑客黄」走黄昏金色调色板、「樱花粉」走樱粉花瓣调色板（两者都是逐档色相渐变），
-    ///     其余十六进制主题按档位加权，上游预设主题沿用统一算法。
+    ///     「剑客黄」走黄昏金色调色板、「樱花粉」走樱粉花瓣调色板、「蜂蜜黄」走蜜脾三色渐变、
+    ///     「黏液绿」走黏液块三色渐变、「琉璃彩」走玻璃棱镜渐变、「曜石黑」走黑曜石紫黑渐变
+    ///     （它们都是逐档色相 / 明度渐变），其余十六进制主题按档位加权，上游预设主题沿用统一算法。
     /// </summary>
     private static CatColorResource[] _CalculateColors(ToneProfile tone, (double hue, double lightAdj, double chromaAdj) args)
     {
@@ -475,6 +548,22 @@ public sealed partial class ThemeService
         if (CurrentTheme == ColorTheme.SakuraPink ||
             string.Equals(_ThemeFlavor(CurrentTheme), "sakura-bloom", StringComparison.OrdinalIgnoreCase))
             return _CalculateColorsSakuraBloom(tone, args);
+        // 「蜂蜜黄」：蜜脾三色（#FADE29 偏黄 → #EA8E16 中间 → #D56B2B 偏橙）的逐档渐变
+        if (CurrentTheme == ColorTheme.HoneyYellow ||
+            string.Equals(_ThemeFlavor(CurrentTheme), "honey-amber", StringComparison.OrdinalIgnoreCase))
+            return _CalculateColorsHoneyAmber(tone, args);
+        // 「黏液绿」：黏液块三色（#7BCE6A → #73C262 → #5AAA43）的逐档渐变
+        if (CurrentTheme == ColorTheme.SlimeGreen ||
+            string.Equals(_ThemeFlavor(CurrentTheme), "slime-gel", StringComparison.OrdinalIgnoreCase))
+            return _CalculateColorsSlimeGel(tone, args);
+        // 「琉璃彩」：玻璃青向品红方向的棱镜渐变（玻璃层本身另有逐帧流动渐变）
+        if (CurrentTheme == ColorTheme.LiuliGlass ||
+            string.Equals(_ThemeFlavor(CurrentTheme), "liuli-prism", StringComparison.OrdinalIgnoreCase))
+            return _CalculateColorsLiuliPrism(tone, args);
+        // 「曜石黑」：黑曜石的紫黑 → 纯黑渐变
+        if (CurrentTheme == ColorTheme.ObsidianBlack ||
+            string.Equals(_ThemeFlavor(CurrentTheme), "obsidian-void", StringComparison.OrdinalIgnoreCase))
+            return _CalculateColorsObsidianVoid(tone, args);
         // 其余「十六进制指定色」主题：加权应用明度 / 色度调整（只让强调色及其邻档变色，
         // 文字与背景仍沿用 ToneProfile 的明度阶梯，避免浅色模式下文字被整体提亮而发白）
         if (IsHexTheme(CurrentTheme)) return _CalculateColorsFromHex(tone, args);
@@ -489,6 +578,7 @@ public sealed partial class ThemeService
         ColorTheme.Custom or ColorTheme.FatFishBlue or ColorTheme.TianyiBlue or ColorTheme.MermanBlue or
         ColorTheme.IchikaBlue or ColorTheme.MikuGreen or ColorTheme.KaoYinGreen or ColorTheme.SwordsmanYellow or
         ColorTheme.SakuraPink or ColorTheme.NetherRed or ColorTheme.MethylOrange or ColorTheme.AmethystPurple or
+        ColorTheme.LiuliGlass or ColorTheme.ObsidianBlack or ColorTheme.HoneyYellow or ColorTheme.SlimeGreen or
         ColorTheme.PluginDefined;
 
     /// <summary>
@@ -542,6 +632,96 @@ public sealed partial class ThemeService
             (-44, -0.02, 0.04), // 6 深琥珀
             (-54, -0.02, 0.02), // 7 暮色橙
             (-70, -0.02, -0.04),// 8 深暮紫橙
+        ];
+        return BuildWeightedColors(tone, args, ramp);
+    }
+
+    /// <summary>
+    ///     「蜂蜜黄」专属配色：蜜脾（<c>item/honeycomb</c>）上的三个主要色
+    ///     —— <c>#FADE29</c>（偏黄）→ <c>#EA8E16</c>（中间）→ <c>#D56B2B</c>（偏橙）——
+    ///     做成逐档渐变：浅档偏黄、5~8 档一路往橙红压。
+    /// </summary>
+    private static CatColorResource[] _CalculateColorsHoneyAmber(ToneProfile tone,
+        (double hue, double lightAdj, double chromaAdj) args)
+    {
+        (double Hue, double Light, double Chroma)[] ramp =
+        [
+            (18, 0.02, -0.12),  // 1 文字档：暖白，不染黄
+            (22, 0.03, -0.06),  // 2 蜜黄（#FADE29 一侧）
+            (0, 0.00, 0.00),    // 3 蜜脾中间色（主色，等于 #EA8E16）
+            (-10, -0.01, 0.02), // 4 琥珀
+            (-20, -0.01, 0.04), // 5 深琥珀
+            (-28, -0.02, 0.04), // 6 焦糖
+            (-36, -0.02, 0.03), // 7 橙棕（#D56B2B 一侧）
+            (-44, -0.02, 0.00)  // 8 深橙棕
+        ];
+        return BuildWeightedColors(tone, args, ramp);
+    }
+
+    /// <summary>
+    ///     「黏液绿」专属配色：黏液块按 alpha 加权统计出的三个主要色
+    ///     —— <c>#7BCE6A</c>（亮）→ <c>#73C262</c>（主）→ <c>#5AAA43</c>（深）——
+    ///     做成逐档渐变。黏液块三色色相几乎一致，所以这里主要靠明度 / 色度拉开层次。
+    /// </summary>
+    private static CatColorResource[] _CalculateColorsSlimeGel(ToneProfile tone,
+        (double hue, double lightAdj, double chromaAdj) args)
+    {
+        (double Hue, double Light, double Chroma)[] ramp =
+        [
+            (4, 0.03, -0.08),   // 1 文字档：几乎不动
+            (3, 0.04, 0.02),    // 2 亮绿（#7BCE6A）
+            (0, 0.00, 0.00),    // 3 黏液绿（主色 #73C262）
+            (-2, -0.02, 0.02),  // 4 果冻绿
+            (-4, -0.03, 0.02),  // 5 深绿（#5AAA43）
+            (-6, -0.04, 0.00),  // 6
+            (-8, -0.04, -0.02), // 7
+            (-10, -0.04, -0.04) // 8
+        ];
+        return BuildWeightedColors(tone, args, ramp);
+    }
+
+    /// <summary>
+    ///     「琉璃彩」专属配色：以原版玻璃的中间色 <c>#A8D0D9</c> 为基准的棱镜渐变，
+    ///     2~8 档沿青 → 冰蓝 → 紫 → 品红旋转，形成玻璃折射出的彩色层次。
+    ///     <para>
+    ///         注意：这只决定**静态**色族（控件强调色）。标题栏 / 玻璃着色层的「随时间缓慢流动的
+    ///         彩色渐变」由宿主逐帧重写少数几个画刷实现（见 <c>ModLiuliGlass</c>）。
+    ///     </para>
+    /// </summary>
+    private static CatColorResource[] _CalculateColorsLiuliPrism(ToneProfile tone,
+        (double hue, double lightAdj, double chromaAdj) args)
+    {
+        (double Hue, double Light, double Chroma)[] ramp =
+        [
+            (30, 0.02, -0.08),   // 1 文字档：微微偏青
+            (45, 0.04, 0.00),    // 2 冰青
+            (0, 0.00, 0.00),     // 3 玻璃青（主色 #A8D0D9）
+            (-30, -0.01, 0.04),  // 4 冰蓝
+            (-60, -0.02, 0.06),  // 5 蓝紫
+            (-90, -0.02, 0.06),  // 6 紫
+            (-120, -0.03, 0.04), // 7 紫红
+            (-150, -0.03, 0.02)  // 8 品红
+        ];
+        return BuildWeightedColors(tone, args, ramp);
+    }
+
+    /// <summary>
+    ///     「曜石黑」专属配色：以原版黑曜石主体色 <c>#100C1C</c> 为基准，
+    ///     浅档略带紫调（黑曜石的紫黑），深档一路压成纯黑。
+    /// </summary>
+    private static CatColorResource[] _CalculateColorsObsidianVoid(ToneProfile tone,
+        (double hue, double lightAdj, double chromaAdj) args)
+    {
+        (double Hue, double Light, double Chroma)[] ramp =
+        [
+            (6, -0.02, -0.10),  // 1 文字档：不染
+            (8, 0.01, -0.04),   // 2 紫黑
+            (0, 0.00, 0.00),    // 3 黑曜石（主色 #100C1C）
+            (-6, -0.02, 0.02),  // 4 深紫黑
+            (-12, -0.03, 0.03), // 5
+            (-18, -0.04, 0.02), // 6
+            (-24, -0.05, 0.00), // 7
+            (-30, -0.06, -0.02) // 8 纯黑
         ];
         return BuildWeightedColors(tone, args, ramp);
     }

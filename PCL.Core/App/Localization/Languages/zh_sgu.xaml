@@ -3234,6 +3234,7 @@
 
     <sys:String x:Key="Setup.Ui.Material.Title">高级材质（窗口）</sys:String>
     <sys:String x:Key="Setup.Ui.Material.Hint">为窗口启用高级材质：云母、Aero 模糊或液态玻璃。标题栏、主界面、侧边栏、卡片的不透明度可以分别调节；系统不支持所选效果时会自动降级。</sys:String>
+    <sys:String x:Key="Setup.Ui.Material.LiuliLocked">琉璃彩主题锁定标题栏 / 主界面 / 侧边栏 / 卡片的不透明度为 30%，不可调整。</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlassCorner">玻璃圆角</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlassCorner.ToolTip">液态玻璃模式下整块玻璃的圆角大小（0~24）。</sys:String>
     <sys:String x:Key="Setup.Ui.Material.Effect">材质效果</sys:String>
@@ -3303,6 +3304,10 @@
     <sys:String x:Key="Setup.Ui.Theme.Color.NetherRed">下界红</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.MethylOrange">甲基橙</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.AmethystPurple">水晶紫</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Honey">蜂蜜黄</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Liuli">琉璃彩</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Obsidian">曜石黑</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Slime">黏液绿</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.MikuGreen">初音绿</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.MermanBlue">海人蓝</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.FatFishBlue">肥鱼蓝</sys:String>
@@ -3321,6 +3326,7 @@
     <sys:String x:Key="Setup.Ui.Theme.CustomColor.Invalid">请输入 #RRGGBB 形式的颜色，例如 #39C5BB</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.CustomColor.ToolTip">自定义主题色的十六进制颜色代码（#RRGGBB）。&#xA;仅在「亮色主题」或「暗色主题」中选择「自定义」时生效。</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.LightColor">浅色配色</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color">配色主题</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Title">主题</sys:String>
 
     <!-- Setup.Update -->

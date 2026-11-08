@@ -667,6 +667,11 @@ public IReadOnlyList<PluginCustomThemeDefinition> GetCustomThemes() =>
 
 * 宿主为每个自定义主题分配独立槽位枚举值（`ColorTheme.PluginDefined16` 起），
   并把它加进「设置 → 界面」的主题下拉框（`ThemeChoice(ColorTheme, string? PluginThemeId)`）。
+  > snapshot-86 起深浅色主题**合并为一个下拉**（`ComboThemeColor`，新语言键 `Setup.Ui.Theme.Color`），
+  > 写入请用 `ThemeService.SetCurrentThemeSelection(theme, pluginThemeId)` —— 它会同时写浅色 / 深色两个槽位
+  > 并触发刷新；直接写 `UiDarkColor` 会被下一次启动时的槽位同步覆盖。
+  > 可用的 `Flavor` 现在有 `golden-dusk` / `sakura-bloom` / `honey-amber` / `slime-gel` /
+  > `liuli-prism` / `obsidian-void`。
 * `CreateTitleDecoration` 返回的元素被放进标题栏右上角容器：**自己设** `HorizontalAlignment` /
   `Width` / `Height` / `Opacity`；宿主保证「不拦鼠标」「跟随主题显隐」「切换主题时重建」。
 * 宿主内置主题（含素材复用）见 [`PLUGIN-THEMES.md`](PLUGIN-THEMES.md)；

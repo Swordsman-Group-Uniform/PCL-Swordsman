@@ -26,6 +26,8 @@ public partial class PageSetupUI
         ColorTheme.FatFishBlue, ColorTheme.TianyiBlue, ColorTheme.MermanBlue, ColorTheme.IchikaBlue,
         ColorTheme.SwordsmanYellow, ColorTheme.SakuraPink, ColorTheme.NetherRed, ColorTheme.MethylOrange,
         ColorTheme.AmethystPurple, ColorTheme.MikuGreen, ColorTheme.KaoYinGreen,
+        // 四个原版贴图主题（snapshot-86）：琉璃彩 / 曜石黑 / 蜂蜜黄 / 黏液绿
+        ColorTheme.LiuliGlass, ColorTheme.ObsidianBlack, ColorTheme.HoneyYellow, ColorTheme.SlimeGreen,
         ColorTheme.Custom
     ];
 
@@ -73,6 +75,10 @@ public partial class PageSetupUI
         ColorTheme.NetherRed => Lang.Text("Setup.Ui.Theme.Color.NetherRed"),
         ColorTheme.MethylOrange => Lang.Text("Setup.Ui.Theme.Color.MethylOrange"),
         ColorTheme.AmethystPurple => Lang.Text("Setup.Ui.Theme.Color.AmethystPurple"),
+        ColorTheme.LiuliGlass => Lang.Text("Setup.Ui.Theme.Color.Liuli"),
+        ColorTheme.ObsidianBlack => Lang.Text("Setup.Ui.Theme.Color.Obsidian"),
+        ColorTheme.HoneyYellow => Lang.Text("Setup.Ui.Theme.Color.Honey"),
+        ColorTheme.SlimeGreen => Lang.Text("Setup.Ui.Theme.Color.Slime"),
         ColorTheme.MikuGreen => Lang.Text("Setup.Ui.Theme.Color.MikuGreen"),
         ColorTheme.MermanBlue => Lang.Text("Setup.Ui.Theme.Color.MermanBlue"),
         ColorTheme.KaoYinGreen => Lang.Text("Setup.Ui.Theme.Color.KaoYinGreen"),
@@ -120,27 +126,17 @@ public partial class PageSetupUI
             SliderLauncherOpacity.Value = Config.Preference.Theme.WindowOpacity;
             CheckLauncherLogo.Checked = Config.Preference.ShowStartupLogo;
             ComboDarkMode.SelectedIndex = (int)Config.Preference.Theme.ColorMode;
+            // 深浅色主题已合并：只有一个配色主题下拉（统一以浅色槽位为准，深色槽位由 ThemeService 镜像）
             var themeChoices = ThemeChoices;
-            var darkIndex = IndexOfChoice(themeChoices, Config.Preference.Theme.DarkColor,
-                Config.Preference.Theme.DarkPluginTheme);
-            if (darkIndex < 0)
-            {
-                Config.Preference.Theme.DarkColor = ColorTheme.CatBlue;
-                Config.Preference.Theme.DarkPluginTheme = "";
-                darkIndex = IndexOfChoice(themeChoices, ColorTheme.CatBlue, null);
-            }
-
-            var lightIndex = IndexOfChoice(themeChoices, Config.Preference.Theme.LightColor,
+            var themeIndex = IndexOfChoice(themeChoices, Config.Preference.Theme.LightColor,
                 Config.Preference.Theme.LightPluginTheme);
-            if (lightIndex < 0)
+            if (themeIndex < 0)
             {
-                Config.Preference.Theme.LightColor = ColorTheme.CatBlue;
-                Config.Preference.Theme.LightPluginTheme = "";
-                lightIndex = IndexOfChoice(themeChoices, ColorTheme.CatBlue, null);
+                ThemeService.SetCurrentThemeSelection(ColorTheme.CatBlue, null);
+                themeIndex = IndexOfChoice(themeChoices, ColorTheme.CatBlue, null);
             }
 
-            ComboDarkColor.SelectedIndex = Math.Max(0, darkIndex);
-            ComboLightColor.SelectedIndex = Math.Max(0, lightIndex);
+            ComboThemeColor.SelectedIndex = Math.Max(0, themeIndex);
             PanCustomColor.Visibility = ThemeService.IsCustomColorEnabled
                 ? Visibility.Visible
                 : Visibility.Collapsed;
@@ -764,18 +760,11 @@ public partial class PageSetupUI
         if (sender.SelectedIndex < 0 || sender.SelectedIndex >= choices.Count) return;
 
         var choice = choices[sender.SelectedIndex];
-        var target = sender.Tag?.ToString();
 
-        // 先写插件主题 id 再写槽位：SetByTag 会立刻触发主题刷新事件，
+        // 深浅色主题已合并：一次选择同时写浅色 / 深色两个槽位（含插件主题 id），
+        // 内部先写插件 id 再写槽位，因为写槽位会立刻触发主题刷新事件，
         // 事件里（标题栏装饰）要能读到新的 id
-        if (target == "UiDarkColor")
-            Config.Preference.Theme.DarkPluginTheme =
-                choice.Theme == ColorTheme.PluginDefined ? choice.PluginThemeId ?? "" : "";
-        else
-            Config.Preference.Theme.LightPluginTheme =
-                choice.Theme == ColorTheme.PluginDefined ? choice.PluginThemeId ?? "" : "";
-
-        SetByTag(target, (int)choice.Theme);
+        ThemeService.SetCurrentThemeSelection(choice.Theme, choice.PluginThemeId);
 
         // 槽位没变、只是换了一个插件主题 id 时，配置事件不会触发（值没变），这里手动补一次配色与装饰
         ThemeService.ApplyColorResources();
@@ -783,6 +772,8 @@ public partial class PageSetupUI
 
         ThemeManager.ThemeRefresh();
         RefreshCustomColorPreview();
+        // 琉璃彩锁定四层不透明度，相关滑条要跟着禁用
+        RefreshMaterialLayout();
     }
 
     // 自定义主题色：校验通过后写回配置并刷新预览
@@ -900,6 +891,20 @@ public partial class PageSetupUI
         // 不再由用户勾选，所以这一项直接隐藏，免得让人以为关掉还有别的磨砂可用
         PanMaterialGlass.Visibility = isGlass ? Visibility.Visible : Visibility.Collapsed;
         LabGlassHint.Visibility = isGlass ? Visibility.Visible : Visibility.Collapsed;
+
+        // 「琉璃彩」主题把四层不透明度锁死 30%（用户定的设计，不是 bug），
+        // 这里把对应滑条禁用并显示说明，免得用户以为滑块坏了
+        var liuliLocked = ThemeService.CurrentTheme == ColorTheme.LiuliGlass;
+        if (LabLiuliLocked is not null)
+            LabLiuliLocked.Visibility = liuliLocked ? Visibility.Visible : Visibility.Collapsed;
+        if (SliderMaterialTitleOpacity is not null)
+        {
+            SliderMaterialTitleOpacity.IsEnabled = !liuliLocked;
+            SliderMaterialMainOpacity.IsEnabled = !liuliLocked;
+            SliderMaterialSidebarOpacity.IsEnabled = !liuliLocked;
+            SliderMaterialCardOpacity.IsEnabled = !liuliLocked;
+        }
+
         CardMaterial.TriggerForceResize();
     }
 
@@ -932,33 +937,20 @@ public partial class PageSetupUI
 
     private void RefreshThemeCombos()
     {
-        if (ComboLightColor is null || ComboDarkColor is null) return;
+        if (ComboThemeColor is null) return;
 
         var choices = ThemeChoices;
         var names = ThemeColors;
 
-        ComboLightColor.ItemsSource = names;
-        ComboDarkColor.ItemsSource = names;
-
-        ComboLightColor.SelectedIndex = Math.Max(0, IndexOfChoice(
+        ComboThemeColor.ItemsSource = names;
+        ComboThemeColor.SelectedIndex = Math.Max(0, IndexOfChoice(
             choices, Config.Preference.Theme.LightColor, Config.Preference.Theme.LightPluginTheme));
-        ComboDarkColor.SelectedIndex = Math.Max(0, IndexOfChoice(
-            choices, Config.Preference.Theme.DarkColor, Config.Preference.Theme.DarkPluginTheme));
 
-        // 选不到了（插件被卸载等）：退回龙猫蓝，避免下拉框停在错误项
+        // 选不到了（插件被卸载等）：退回龙猫蓝，避免下拉框停在错误项。
+        // 深浅色主题已合并，回退要同时写两个槽位（走 ThemeService 才不会只改一半）。
         if (IndexOfChoice(choices, Config.Preference.Theme.LightColor,
                 Config.Preference.Theme.LightPluginTheme) < 0)
-        {
-            Config.Preference.Theme.LightColor = ColorTheme.CatBlue;
-            Config.Preference.Theme.LightPluginTheme = "";
-        }
-
-        if (IndexOfChoice(choices, Config.Preference.Theme.DarkColor,
-                Config.Preference.Theme.DarkPluginTheme) < 0)
-        {
-            Config.Preference.Theme.DarkColor = ColorTheme.CatBlue;
-            Config.Preference.Theme.DarkPluginTheme = "";
-        }
+            ThemeService.SetCurrentThemeSelection(ColorTheme.CatBlue, null);
     }
 
     /// <summary>

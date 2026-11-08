@@ -3234,6 +3234,7 @@
 
     <sys:String x:Key="Setup.Ui.Material.Title">Advanced materials (window)</sys:String>
     <sys:String x:Key="Setup.Ui.Material.Hint">Enables advanced materials for the window: Mica, Aero blur or liquid glass. The opacity of the title bar, main area, sidebar and cards can each be adjusted separately; unsupported effects fall back automatically.</sys:String>
+    <sys:String x:Key="Setup.Ui.Material.LiuliLocked">The Colored Glass theme locks the title bar / main area / sidebar / cards at 30% opacity, so these sliders are disabled.</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlassCorner">Glass corner radius</sys:String>
     <sys:String x:Key="Setup.Ui.Material.GlassCorner.ToolTip">Corner radius of the big glass pane in liquid glass mode (0-24).</sys:String>
     <sys:String x:Key="Setup.Ui.Material.Effect">Material effect</sys:String>
@@ -3305,6 +3306,10 @@
     <sys:String x:Key="Setup.Ui.Theme.Color.NetherRed">Nether Red</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.MethylOrange">Methyl Orange</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.AmethystPurple">Amethyst Purple</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Honey">Honey Yellow</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Liuli">Colored Glass</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Obsidian">Obsidian Black</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Slime">Slime Green</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.MikuGreen">Miku Green</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.MermanBlue">Merman Blue</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.FatFishBlue">Fat Fish Blue</sys:String>
@@ -3321,6 +3326,7 @@
     <sys:String x:Key="Setup.Ui.Theme.CustomColor.Invalid">Please enter a #RRGGBB color, e.g. #39C5BB</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.CustomColor.ToolTip">Hex color code (#RRGGBB) of the custom theme color.&#xA;Takes effect only when "Custom" is selected for the light or dark theme.</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.LightColor">Light theme color</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color">Palette</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Title">Theme</sys:String>
 
     <!-- Setup.Update -->

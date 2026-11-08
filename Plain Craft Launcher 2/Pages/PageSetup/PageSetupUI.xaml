@@ -48,8 +48,6 @@
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="92" SharedSizeGroup="SubName" />
                                 <ColumnDefinition />
-                                <ColumnDefinition SharedSizeGroup="SubName" />
-                                <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource Setup.Ui.Theme.Title}" />
                             <local:MyComboBox Grid.Column="1" x:Name="ComboDarkMode" Tag="UiDarkMode"
@@ -58,11 +56,9 @@
                                 <local:MyComboBoxItem Content="{DynamicResource Setup.Ui.Theme.Dark}" />
                                 <local:MyComboBoxItem Content="{DynamicResource Setup.Ui.Theme.FollowSystem}" /> <!-- default -->
                             </local:MyComboBox>
-                            <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Setup.Ui.Theme.LightColor}"/>
-                            <local:MyComboBox Grid.Column="3" x:Name="ComboLightColor" Tag="UiLightColor" ItemsSource="{Binding ThemeColors}" SelectionChanged="ThemeColor_Change"/>
-                            <TextBlock Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Setup.Ui.Theme.DarkColor}"/>
-                            <local:MyComboBox Grid.Column="5" x:Name="ComboDarkColor" Tag="UiDarkColor" ItemsSource="{Binding ThemeColors}" SelectionChanged="ThemeColor_Change"/>
-
+                            <!-- 深浅色主题已合并：浅色与深色共用这一个配色选择（snapshot-86） -->
+                            <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Setup.Ui.Theme.Color}"/>
+                            <local:MyComboBox Grid.Column="3" x:Name="ComboThemeColor" Tag="UiThemeColor" ItemsSource="{Binding ThemeColors}" SelectionChanged="ThemeColor_Change"/>
                         </Grid>
                         <Grid Height="28" Margin="0,0,0,7" x:Name="PanCustomColor">
                             <Grid.ColumnDefinitions>
@@ -172,6 +168,10 @@
                     </Grid>
                     <TextBlock x:Name="LabMaterialStatus" FontSize="12" Opacity="0.6" TextWrapping="Wrap"
                                Margin="0,0,0,10" />
+                    <!-- 「琉璃彩」主题把四层不透明度锁在 30%，这里给出说明并把滑条禁用 -->
+                    <TextBlock x:Name="LabLiuliLocked" Visibility="Collapsed" FontSize="12" Opacity="0.7"
+                               TextWrapping="Wrap" Margin="0,0,0,10"
+                               Text="{DynamicResource Setup.Ui.Material.LiuliLocked}" />
                     <StackPanel>
                         <TextBlock x:Name="LabGlassHint" Visibility="Collapsed" FontSize="12" Opacity="0.7"
                                    TextWrapping="Wrap" Margin="0,0,0,10"

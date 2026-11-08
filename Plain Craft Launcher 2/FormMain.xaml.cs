@@ -696,13 +696,17 @@ public partial class FormMain
 
     // 标题栏改变大小
     /// <summary>
-    ///     根据当前主题刷新标题栏装饰，五个主题各一套，互斥：
+    ///     根据当前主题刷新标题栏装饰，各主题互斥：
     ///     <list type="bullet">
     ///         <item>剑客黄 → 半透明钻石剑 + 黄昏圣光</item>
     ///         <item>樱花粉 → 原版樱花粒子（右上角飘落）+ 樱粉柔光</item>
     ///         <item>下界红 → 整条标题栏的地狱疣块贴图</item>
     ///         <item>甲基橙 → 右上角的甲基橙化学式像素字</item>
     ///         <item>水晶紫 → 整条标题栏的紫水晶块贴图</item>
+    ///         <item>曜石黑 → 黑曜石铺满 + 哭泣黑曜石占右侧 20% 贴图</item>
+    ///         <item>蜂蜜黄 → 蜂巢侧面 10% + 蜂巢块 40% + 蜜脾 40% + 蜂箱侧面 10%</item>
+    ///         <item>黏液绿 → 整条标题栏的黏液块贴图</item>
+    ///         <item>琉璃彩 → 三块大玻璃 + 8px 玻璃边缘 + 玻璃内部粒子 + 逐帧流动渐变</item>
     ///         <item>肥鱼蓝 → 右上角低透明度的肥鱼像</item>
     ///     </list>
     /// </summary>
@@ -723,10 +727,58 @@ public partial class FormMain
         // 插件自带主题：装饰由插件给（可能没有）
         RefreshPluginThemeDecoration(theme);
 
-        RectTitleNether.Visibility = theme == ColorTheme.NetherRed ? Visibility.Visible : Visibility.Collapsed;
-        RectTitleAmethyst.Visibility = theme == ColorTheme.AmethystPurple ? Visibility.Visible : Visibility.Collapsed;
+        // 贴图类主题：贴图由代码加载（缺文件时那一层留空，不影响其它装饰）
+        var isNetherRed = theme == ColorTheme.NetherRed;
+        FillTitleTexture(RectTitleNether, isNetherRed, "NetherWartBlock.png");
+        RectTitleNether.Visibility = isNetherRed ? Visibility.Visible : Visibility.Collapsed;
+
+        var isAmethyst = theme == ColorTheme.AmethystPurple;
+        FillTitleTexture(RectTitleAmethyst, isAmethyst, "AmethystBlock.png");
+        RectTitleAmethyst.Visibility = isAmethyst ? Visibility.Visible : Visibility.Collapsed;
+
+        // 曜石黑：黑曜石铺满 + 哭泣黑曜石占 20%（用户要求的比例）
+        var isObsidian = theme == ColorTheme.ObsidianBlack;
+        if (isObsidian)
+        {
+            FillTitleTexture(RectTitleObsidian, true, "Obsidian.png");
+            FillTitleTexture(RectTitleCryingObsidian, true, "CryingObsidian.png");
+        }
+
+        GridTitleObsidian.Visibility = isObsidian ? Visibility.Visible : Visibility.Collapsed;
+
+        // 蜂蜜黄：蜂巢块 40% + 蜜脾 40% 打底，两侧各 10% 是蜂巢 / 蜂箱的侧面贴图
+        var isHoney = theme == ColorTheme.HoneyYellow;
+        if (isHoney)
+        {
+            FillTitleTexture(RectTitleBeeNest, true, "BeeNestSide.png");
+            FillTitleTexture(RectTitleHoneycombBlock, true, "HoneycombBlock.png");
+            FillTitleTexture(RectTitleHoneycomb, true, "Honeycomb.png");
+            FillTitleTexture(RectTitleBeehive, true, "BeehiveSide.png");
+        }
+
+        GridTitleHoney.Visibility = isHoney ? Visibility.Visible : Visibility.Collapsed;
+
+        // 黏液绿：黏液块铺满标题栏
+        var isSlime = theme == ColorTheme.SlimeGreen;
+        FillTitleTexture(RectTitleSlime, isSlime, "SlimeBlock.png");
+        RectTitleSlime.Visibility = isSlime ? Visibility.Visible : Visibility.Collapsed;
+
         ImgTitleFormula.Visibility = theme == ColorTheme.MethylOrange ? Visibility.Visible : Visibility.Collapsed;
         ImgTitleFatFish.Visibility = theme == ColorTheme.FatFishBlue ? Visibility.Visible : Visibility.Collapsed;
+
+        // 琉璃彩：三块大玻璃（标题栏 / 侧边栏 / 主界面）+ 8px 原版玻璃边缘 + 玻璃内部粒子
+        ModLiuliGlass.SetEnabled(theme == ColorTheme.LiuliGlass);
+    }
+
+    /// <summary>
+    ///     给标题栏的贴图层填上平铺画刷（同一个主题反复刷新时不重复赋值）。
+    /// </summary>
+    private static void FillTitleTexture(System.Windows.Shapes.Shape shape, bool visible, string fileName)
+    {
+        if (!visible || shape is null) return;
+        var brush = ModTitleTextures.GetTiled(fileName);
+        if (brush is null || ReferenceEquals(shape.Fill, brush)) return;
+        shape.Fill = brush;
     }
 
     /// <summary>

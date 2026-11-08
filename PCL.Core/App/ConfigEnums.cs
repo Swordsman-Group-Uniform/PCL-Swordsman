@@ -104,7 +104,28 @@ public enum ColorTheme
     /// （<c>UiLightPluginTheme</c> / <c>UiDarkPluginTheme</c>），
     /// 主题下拉框里每个插件主题都映射到这个槽位。
     /// </summary>
-    PluginDefined = 16
+    PluginDefined = 16,
+
+    /// <summary>
+    /// 琉璃彩（玻璃三色 #D0EAE9 / #A8D0D9 / #8BC1CD）。使用该主题时启动器整体半透明，
+    /// 标题栏 / 侧边栏 / 主界面是三块原版玻璃，主题色是随时间缓慢流动的彩色渐变。
+    /// </summary>
+    LiuliGlass = 17,
+
+    /// <summary>
+    /// 曜石黑（取原版黑曜石主体色 #100C1C）。使用该主题时标题栏覆盖黑曜石 + 哭泣黑曜石贴图。
+    /// </summary>
+    ObsidianBlack = 18,
+
+    /// <summary>
+    /// 蜂蜜黄（蜜脾三色 #FADE29 → #EA8E16 → #D56B2B）。使用该主题时标题栏覆盖蜂巢 / 蜜脾贴图。
+    /// </summary>
+    HoneyYellow = 19,
+
+    /// <summary>
+    /// 黏液绿（黏液块三色 #7BCE6A → #73C262 → #5AAA43）。使用该主题时标题栏覆盖黏液块贴图。
+    /// </summary>
+    SlimeGreen = 20
 }
 
 /// <summary>
