@@ -7,6 +7,16 @@
 
 > 括号外为下游版本号，括号内为**标注用的**上游版本号（**不追上游同步**，见 `HANDOVER.md` §0.19 / §4.1）。
 
+## snapshot-88：配色主题改为平铺选择器（仿原版 PCL）
+
+- `PageSetupUI` 里把「配色主题」下拉框（`ComboThemeColor`）换成 `WrapPanel x:Name="PanThemeChooser"`：
+  `RefreshThemeChooser()` 按 `ThemeChoices` 逐个生成条目（小圆点 + 名字），点击走 `ThemeChoice_Click(index)`。
+- 小圆点颜色新增 `ThemeService.GetThemeAccentColor(ColorTheme)` / `GetThemeAccentColor(string? pluginThemeId)`；
+  为此把 `GetCurrentThemeArgs()` 的 switch 抽成 `GetThemeArgs(ColorTheme)`（`GetCurrentThemeArgs()` 仍保留）。
+- 「琉璃彩Beta」的圆点用 OKLCH 五色渐变小彩虹；插件主题用插件给的 hex。
+- 选中态 = `ColorBrush3` 描边 + SemiBold；悬停 = `ColorBrushSemiTransparent` 底色。
+- 版本号 `27.1.1-snapshot-88(2.15.2)`，`code` 614。**此项观感变化可能回滚**。
+
 ## snapshot-87：琉璃彩改纯彩色渐变 + 标题栏贴图密铺
 
 - **琉璃彩 → 琉璃彩Beta**（显示名）：本体改为**纯彩色渐变**，撤掉全部贴图（`Glass.png` 内部纹理、

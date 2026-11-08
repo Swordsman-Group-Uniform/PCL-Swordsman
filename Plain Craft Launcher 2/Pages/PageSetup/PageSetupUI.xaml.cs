@@ -59,7 +59,14 @@ public partial class PageSetupUI
     /// <summary>兼容旧代码：只取槽位枚举（插件主题会出现多个重复的 PluginDefined）。</summary>
     private static ColorTheme[] ThemeColorValues => ThemeChoices.Select(choice => choice.Theme).ToArray();
 
-    public string[] ThemeColors => ThemeChoices.Select(choice =>
+    /// <summary>
+    ///     全部主题的显示名（顺序与 <see cref="ThemeChoices" /> 一致）。
+    ///     平铺选择器与旧的 <c>ThemeColors</c> 绑定都用它。
+    /// </summary>
+    public string[] ThemeColors => ThemeChoices.Select(ThemeChoiceName).ToArray();
+
+    /// <summary>一个主题项的显示名：插件主题 → 插件给的名字；内置主题 → 插件覆盖名 / 本地化文案。</summary>
+    private static string ThemeChoiceName(ThemeChoice choice) =>
         choice.PluginThemeId is not null
             ? ThemeService.GetPluginThemeDisplayName(choice.PluginThemeId) ?? choice.PluginThemeId
             : ThemeService.GetExtraThemeDisplayName(choice.Theme) ?? (choice.Theme switch
@@ -85,7 +92,7 @@ public partial class PageSetupUI
         ColorTheme.IchikaBlue => Lang.Text("Setup.Ui.Theme.Color.IchikaBlue"),
         ColorTheme.PluginDefined => Lang.Text("Setup.Ui.Theme.Color.Custom"),
         _ => Lang.Text("Setup.Ui.Theme.Color.Custom")
-    })).ToArray();
+    });
     
     public new bool isLoaded;
 
@@ -136,7 +143,7 @@ public partial class PageSetupUI
                 themeIndex = IndexOfChoice(themeChoices, ColorTheme.CatBlue, null);
             }
 
-            ComboThemeColor.SelectedIndex = Math.Max(0, themeIndex);
+            RefreshThemeChooser();
             PanCustomColor.Visibility = ThemeService.IsCustomColorEnabled
                 ? Visibility.Visible
                 : Visibility.Collapsed;
@@ -752,14 +759,13 @@ public partial class PageSetupUI
         ModBase.OpenWebsite("https://docs.pclc.cc/ce/customization/xaml-format");
     }
 
-    // 主题
-    private void ThemeColor_Change(object senderRaw, SelectionChangedEventArgs e)
+    // 主题：平铺选择器里点了某一项
+    private void ThemeChoice_Click(int index)
     {
-        var sender = (MyComboBox)senderRaw;
         var choices = ThemeChoices;
-        if (sender.SelectedIndex < 0 || sender.SelectedIndex >= choices.Count) return;
+        if (index < 0 || index >= choices.Count) return;
 
-        var choice = choices[sender.SelectedIndex];
+        var choice = choices[index];
 
         // 深浅色主题已合并：一次选择同时写浅色 / 深色两个槽位（含插件主题 id），
         // 内部先写插件 id 再写槽位，因为写槽位会立刻触发主题刷新事件，
@@ -772,14 +778,125 @@ public partial class PageSetupUI
 
         ThemeManager.ThemeRefresh();
         RefreshCustomColorPreview();
-        // 琉璃彩锁定四层不透明度，相关滑条要跟着禁用
+        // 琉璃彩Beta 锁定四层不透明度，相关滑条要跟着禁用
         RefreshMaterialLayout();
+        // 配色刚整体换过：重画一遍选择器（选中态 + 圆点颜色）
+        RefreshThemeChooser();
+    }
+
+    /// <summary>
+    ///     重建「配色主题」的平铺选择器：仿原版 PCL，把所有主题平铺在卡片上，
+    ///     每项前面一个小圆点（该主题的主色），点一下直接切过去。
+    ///     <para>
+    ///         插件主题也在列表里（由 <see cref="ThemeChoices" /> 提供），所以插件装卸后要重建一次 ——
+    ///         见 <see cref="MaterialFeatureChanged" />。选中项用主色描边 + 加粗表示。
+    ///     </para>
+    /// </summary>
+    private void RefreshThemeChooser()
+    {
+        if (PanThemeChooser is null) return;
+
+        PanThemeChooser.Children.Clear();
+
+        var choices = ThemeChoices;
+        var selected = IndexOfChoice(choices, Config.Preference.Theme.LightColor,
+            Config.Preference.Theme.LightPluginTheme);
+
+        for (var i = 0; i < choices.Count; i++)
+            PanThemeChooser.Children.Add(BuildThemeChoiceItem(choices[i], i, i == selected));
+    }
+
+    /// <summary>造一个主题项：小圆点 + 名字，点一下就切换。</summary>
+    private Border BuildThemeChoiceItem(ThemeChoice choice, int index, bool selected)
+    {
+        // 全限定：本文件同时 using 了 System.IO，加 using System.Windows.Shapes 会让 Path 变得有歧义
+        var dot = new System.Windows.Shapes.Ellipse
+        {
+            Width = 10d,
+            Height = 10d,
+            Margin = new Thickness(0d, 0d, 7d, 0d),
+            VerticalAlignment = VerticalAlignment.Center,
+            Fill = BuildThemeDotBrush(choice)
+        };
+
+        var text = new TextBlock
+        {
+            Text = ThemeChoiceName(choice),
+            FontSize = 13d,
+            VerticalAlignment = VerticalAlignment.Center,
+            FontWeight = selected ? FontWeights.SemiBold : FontWeights.Normal
+        };
+        text.SetResourceReference(TextBlock.ForegroundProperty, "ColorBrush1");
+
+        var content = new StackPanel { Orientation = Orientation.Horizontal };
+        content.Children.Add(dot);
+        content.Children.Add(text);
+
+        var item = new Border
+        {
+            Child = content,
+            CornerRadius = new CornerRadius(4d),
+            Padding = new Thickness(9d, 4d, 11d, 4d),
+            Margin = new Thickness(0d, 0d, 7d, 7d),
+            BorderThickness = new Thickness(selected ? 2d : 1d),
+            Cursor = Cursors.Hand,
+            Background = Brushes.Transparent
+        };
+        // 选中 = 主色描边；未选中 = 灰色细边。用资源引用，主题一换颜色自己跟上
+        item.SetResourceReference(Border.BorderBrushProperty, selected ? "ColorBrush3" : "ColorBrushGray4");
+
+        item.MouseEnter += (_, _) =>
+        {
+            if (!selected) item.SetResourceReference(Border.BackgroundProperty, "ColorBrushSemiTransparent");
+        };
+        item.MouseLeave += (_, _) =>
+        {
+            if (!selected) item.Background = Brushes.Transparent;
+        };
+        item.MouseLeftButtonUp += (_, e) =>
+        {
+            e.Handled = true;
+            ThemeChoice_Click(index);
+        };
+
+        return item;
+    }
+
+    /// <summary>
+    ///     主题项前的小圆点：一般就是该主题的主色；「琉璃彩Beta」是彩色渐变，
+    ///     所以给它画一个小彩虹圆点，一眼能和别的主题区分开。
+    /// </summary>
+    private static Brush BuildThemeDotBrush(ThemeChoice choice)
+    {
+        if (choice.PluginThemeId is not null)
+            return new SolidColorBrush(ThemeService.GetThemeAccentColor(choice.PluginThemeId));
+
+        if (choice.Theme == ColorTheme.LiuliGlass)
+        {
+            var rainbow = new LinearGradientBrush
+            {
+                StartPoint = new Point(0d, 0d),
+                EndPoint = new Point(1d, 1d)
+            };
+            double[] hues = [0d, 70d, 140d, 210d, 280d];
+            for (var i = 0; i < hues.Length; i++)
+                rainbow.GradientStops.Add(new GradientStop(
+                    LabColor.FromLch(0.78d, 0.19d, hues[i]), i / (double)(hues.Length - 1)));
+            rainbow.Freeze();
+            return rainbow;
+        }
+
+        var brush = new SolidColorBrush(ThemeService.GetThemeAccentColor(choice.Theme));
+        brush.Freeze();
+        return brush;
     }
 
     // 自定义主题色：校验通过后写回配置并刷新预览
     private void TextCustomColor_ValidatedTextChanged(object sender, RoutedEventArgs e)
     {
         RefreshCustomColorPreview();
+        // 「自定义」那一项的小圆点跟着新颜色走
+        RefreshThemeChooser();
         var normalized = ThemeService.NormalizeHexColor(TextCustomColor.Text);
         if (normalized is null) return;
         if (normalized == Config.Preference.Theme.CustomColor) return;
@@ -937,20 +1054,15 @@ public partial class PageSetupUI
 
     private void RefreshThemeCombos()
     {
-        if (ComboThemeColor is null) return;
+        if (PanThemeChooser is null) return;
 
-        var choices = ThemeChoices;
-        var names = ThemeColors;
-
-        ComboThemeColor.ItemsSource = names;
-        ComboThemeColor.SelectedIndex = Math.Max(0, IndexOfChoice(
-            choices, Config.Preference.Theme.LightColor, Config.Preference.Theme.LightPluginTheme));
-
-        // 选不到了（插件被卸载等）：退回龙猫蓝，避免下拉框停在错误项。
+        // 选不到了（插件被卸载等）：退回龙猫蓝，避免列表里的选中项悬空。
         // 深浅色主题已合并，回退要同时写两个槽位（走 ThemeService 才不会只改一半）。
-        if (IndexOfChoice(choices, Config.Preference.Theme.LightColor,
+        if (IndexOfChoice(ThemeChoices, Config.Preference.Theme.LightColor,
                 Config.Preference.Theme.LightPluginTheme) < 0)
             ThemeService.SetCurrentThemeSelection(ColorTheme.CatBlue, null);
+
+        RefreshThemeChooser();
     }
 
     /// <summary>

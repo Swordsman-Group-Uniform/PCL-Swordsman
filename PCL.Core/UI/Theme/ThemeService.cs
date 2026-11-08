@@ -400,43 +400,87 @@ public sealed partial class ThemeService
     /// 获取当前色彩主题对应的各种参数。
     /// 色相使用 <see cref="double" /> 以便自定义主题色能够被精确还原。
     /// </summary>
-    public static (double Hue, double LightAdjust, double ChromaAdjust) GetCurrentThemeArgs()
+    public static (double Hue, double LightAdjust, double ChromaAdjust) GetCurrentThemeArgs() =>
+        GetThemeArgs(CurrentTheme);
+
+    /// <summary>
+    ///     取**指定**色彩主题的各种参数（设置页的平铺选择器要一次性取出所有主题的颜色）。
+    ///     <para>
+    ///         插件自带主题（<see cref="ColorTheme.PluginDefined" />）与自定义主题取的是**当前选中**的那一份；
+    ///         需要按插件 id 取色时请用 <see cref="GetThemeAccentColor(string?)" />。
+    ///     </para>
+    /// </summary>
+    public static (double Hue, double LightAdjust, double ChromaAdjust) GetThemeArgs(ColorTheme theme) => theme switch
     {
-        var theme = CurrentTheme;
-        return theme switch
-        {
-            ColorTheme.SkyBlue => (235d, 0.36, 0.2),
-            ColorTheme.CatBlue => (255d, 0, -0.2),
-            ColorTheme.DeathBlue => (268d, -0.05, -0.1),
-            ColorTheme.HmclBlue => (275d, -0.03, -0.35),
-            ColorTheme.Custom => _GetThemeArgsFromHex(Config.Preference.Theme.CustomColor, (255d, 0d, -0.2)),
-            // 肥鱼蓝：取 DeepSeek Logo 的主色 #4D6BFE
-            ColorTheme.FatFishBlue => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.FatFishBlue, "#4D6BFE"), (250d, 0d, -0.2)),
-            ColorTheme.TianyiBlue => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.TianyiBlue, "#66CCFF"), (230d, 0.2d, 0.1d)),
-            ColorTheme.SwordsmanYellow => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.SwordsmanYellow, "#E8B33C"), (75d, 0d, 0d)),
-            ColorTheme.MikuGreen => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.MikuGreen, "#39C5BB"), (190d, 0d, 0d)),
-            ColorTheme.MermanBlue => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.MermanBlue, "#3366CC"), (245d, 0d, 0d)),
-            ColorTheme.KaoYinGreen => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.KaoYinGreen, "#33CCBB"), (185d, 0d, 0d)),
-            ColorTheme.IchikaBlue => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.IchikaBlue, "#33AAEE"), (235d, 0d, 0d)),
-            ColorTheme.SakuraPink => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.SakuraPink, "#FF94D6"), (340d, 0d, 0d)),
-            ColorTheme.NetherRed => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.NetherRed, "#B3392E"), (30d, 0d, 0d)),
-            ColorTheme.MethylOrange => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.MethylOrange, "#EE7B1E"), (55d, 0d, 0d)),
-            ColorTheme.AmethystPurple => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.AmethystPurple, "#9A5CE0"), (300d, 0d, 0d)),
-            // 琉璃彩：取原版玻璃的三色中间值 #A8D0D9 作基准色族，界面上的流动渐变由宿主逐帧另算
-            ColorTheme.LiuliGlass => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.LiuliGlass, "#A8D0D9"), (205d, 0.1d, 0.05d)),
-            // 曜石黑：取原版黑曜石的主体色 #100C1C（比纯黑有层次）
-            ColorTheme.ObsidianBlack => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.ObsidianBlack, "#100C1C"), (285d, -0.6d, -0.4d)),
-            // 蜂蜜黄：取蜜脾三色的中间色 #EA8E16（两端 #FADE29 / #D56B2B 由色阶渐变补出来）
-            ColorTheme.HoneyYellow => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.HoneyYellow, "#EA8E16"), (62d, 0d, 0d)),
-            // 黏液绿：取黏液块的主色 #73C262（按 alpha 加权统计）
-            ColorTheme.SlimeGreen => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.SlimeGreen, "#73C262"), (140d, 0d, 0d)),
-            ColorTheme.PluginDefined => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.PluginDefined, "#5C5C5C"), (255d, 0d, -0.2d)),
+        ColorTheme.SkyBlue => (235d, 0.36, 0.2),
+        ColorTheme.CatBlue => (255d, 0, -0.2),
+        ColorTheme.DeathBlue => (268d, -0.05, -0.1),
+        ColorTheme.HmclBlue => (275d, -0.03, -0.35),
+        ColorTheme.Custom => _GetThemeArgsFromHex(Config.Preference.Theme.CustomColor, (255d, 0d, -0.2)),
+        // 肥鱼蓝：取 DeepSeek Logo 的主色 #4D6BFE
+        ColorTheme.FatFishBlue => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.FatFishBlue, "#4D6BFE"), (250d, 0d, -0.2)),
+        ColorTheme.TianyiBlue => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.TianyiBlue, "#66CCFF"), (230d, 0.2d, 0.1d)),
+        ColorTheme.SwordsmanYellow => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.SwordsmanYellow, "#E8B33C"), (75d, 0d, 0d)),
+        ColorTheme.MikuGreen => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.MikuGreen, "#39C5BB"), (190d, 0d, 0d)),
+        ColorTheme.MermanBlue => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.MermanBlue, "#3366CC"), (245d, 0d, 0d)),
+        ColorTheme.KaoYinGreen => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.KaoYinGreen, "#33CCBB"), (185d, 0d, 0d)),
+        ColorTheme.IchikaBlue => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.IchikaBlue, "#33AAEE"), (235d, 0d, 0d)),
+        ColorTheme.SakuraPink => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.SakuraPink, "#FF94D6"), (340d, 0d, 0d)),
+        ColorTheme.NetherRed => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.NetherRed, "#B3392E"), (30d, 0d, 0d)),
+        ColorTheme.MethylOrange => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.MethylOrange, "#EE7B1E"), (55d, 0d, 0d)),
+        ColorTheme.AmethystPurple => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.AmethystPurple, "#9A5CE0"), (300d, 0d, 0d)),
+        // 琉璃彩Beta：取原版玻璃的三色中间值 #A8D0D9 作基准色族，界面上的流动渐变由宿主逐帧另算
+        ColorTheme.LiuliGlass => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.LiuliGlass, "#A8D0D9"), (205d, 0.1d, 0.05d)),
+        // 曜石黑：取原版黑曜石的主体色 #100C1C（比纯黑有层次）
+        ColorTheme.ObsidianBlack => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.ObsidianBlack, "#100C1C"), (285d, -0.6d, -0.4d)),
+        // 蜂蜜黄：取蜜脾三色的中间色 #EA8E16（两端 #FADE29 / #D56B2B 由色阶渐变补出来）
+        ColorTheme.HoneyYellow => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.HoneyYellow, "#EA8E16"), (62d, 0d, 0d)),
+        // 黏液绿：取黏液块的主色 #73C262（按 alpha 加权统计）
+        ColorTheme.SlimeGreen => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.SlimeGreen, "#73C262"), (140d, 0d, 0d)),
+        ColorTheme.PluginDefined => _GetThemeArgsFromHex(_ThemeHex(ColorTheme.PluginDefined, "#5C5C5C"), (255d, 0d, -0.2d)),
 #if DEBUG
-            _ => ((double)theme, 0, 0)
+        _ => ((double)theme, 0, 0)
 #else
-            _ => throw new IndexOutOfRangeException($"Invalid theme index: {(int)theme}")
+        _ => throw new IndexOutOfRangeException($"Invalid theme index: {(int)theme}")
 #endif
-        };
+    };
+
+    /// <summary>
+    ///     取某个内置主题的**主色**（设置页「配色主题」平铺选择器里那个小圆点的颜色）。
+    ///     算法与配色生成一致：把该主题的明度 / 色度调整套到当前 tone 的 3 号档上。
+    /// </summary>
+    public static System.Windows.Media.Color GetThemeAccentColor(ColorTheme theme)
+    {
+        var (hue, lightAdjust, chromaAdjust) = GetThemeArgs(theme);
+        var tone = CurrentTone;
+        return LabColor.FromLch(
+            _AdjustLinear(tone.L3, lightAdjust),
+            _AdjustLinear(tone.C3, chromaAdjust),
+            hue).ToWpfColor();
+    }
+
+    /// <summary>插件自带主题的十六进制主色（没有则返回 <see langword="null" />）。</summary>
+    public static string? GetPluginThemeHex(string? pluginThemeId) =>
+        pluginThemeId is not null && _pluginThemeHex.TryGetValue(pluginThemeId, out var hex) &&
+        !string.IsNullOrWhiteSpace(hex)
+            ? hex
+            : null;
+
+    /// <summary>
+    ///     取某个插件自带主题的**主色**（平铺选择器里的小圆点）。没有该 id 时回退到
+    ///     <see cref="ColorTheme.PluginDefined" /> 的兜底色。
+    /// </summary>
+    public static System.Windows.Media.Color GetThemeAccentColor(string? pluginThemeId)
+    {
+        var hex = GetPluginThemeHex(pluginThemeId);
+        if (hex is null) return GetThemeAccentColor(ColorTheme.PluginDefined);
+
+        var (hue, lightAdjust, chromaAdjust) = _GetThemeArgsFromHex(hex, (255d, 0d, -0.2d));
+        var tone = CurrentTone;
+        return LabColor.FromLch(
+            _AdjustLinear(tone.L3, lightAdjust),
+            _AdjustLinear(tone.C3, chromaAdjust),
+            hue).ToWpfColor();
     }
 
     /// <summary>

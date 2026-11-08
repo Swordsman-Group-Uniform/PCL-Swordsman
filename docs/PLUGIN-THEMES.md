@@ -45,7 +45,7 @@ public sealed class PluginCustomThemeDefinition
 | 取主色 | `ThemeService._ThemeHex(ColorTheme.PluginDefined, …)` | 按 `CurrentPluginThemeId` 查表；查不到用兜底色 |
 | 取风格 | `ThemeService._ThemeFlavor(...)` | 同上有 flavor 时走专属 ramp，否则按档位加权 |
 | 可选性 | `ThemeService.IsThemeSelectable(PluginDefined)` | 有任意插件主题即可选（不受 `themes.extended` 限制） |
-| 下拉框 | `PageSetupUI.ThemeChoices` | `ThemeChoice(Theme, PluginThemeId)` 列表；选插件主题时同时写槽位与 id |
+| 选择器 | `PageSetupUI.ThemeChoices` + `RefreshThemeChooser()` | `ThemeChoice(Theme, PluginThemeId)` 列表，**平铺**成带小圆点的条目（snapshot-88 起，原为下拉框）；选插件主题时同时写槽位与 id |
 | 校验 | `ModSetup.ValidateThemeSelection()` | 插件主题被卸载 → 回退龙猫蓝并清空 id |
 | 标题栏 | `FormMain.RefreshPluginThemeDecoration()` | 按 id 取 `CreateTitleDecoration`，创建一次后缓存，切走即断开引用 |
 

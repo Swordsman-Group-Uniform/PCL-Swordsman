@@ -45,9 +45,8 @@
                         <Grid Height="28" Margin="0,0,0,7">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="Name1" />
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="92" SharedSizeGroup="SubName" />
-                                <ColumnDefinition />
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="1*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource Setup.Ui.Theme.Title}" />
                             <local:MyComboBox Grid.Column="1" x:Name="ComboDarkMode" Tag="UiDarkMode"
@@ -56,9 +55,19 @@
                                 <local:MyComboBoxItem Content="{DynamicResource Setup.Ui.Theme.Dark}" />
                                 <local:MyComboBoxItem Content="{DynamicResource Setup.Ui.Theme.FollowSystem}" /> <!-- default -->
                             </local:MyComboBox>
-                            <!-- 深浅色主题已合并：浅色与深色共用这一个配色选择（snapshot-86） -->
-                            <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Setup.Ui.Theme.Color}"/>
-                            <local:MyComboBox Grid.Column="3" x:Name="ComboThemeColor" Tag="UiThemeColor" ItemsSource="{Binding ThemeColors}" SelectionChanged="ThemeColor_Change"/>
+                        </Grid>
+                        <!-- 配色主题：仿原版 PCL 的平铺选择器 —— 所有主题平铺在卡片上，
+                             每个项目前一个小圆点（该主题的主色），点一下就切换过去。
+                             深浅色主题已合并，这一个选择同时决定浅色 / 深色两套配色。
+                             条目由 PageSetupUI.RefreshThemeChooser 动态生成（插件主题也能列进来）。 -->
+                        <Grid Margin="0,0,0,7">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="Name1" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                       Margin="0,0,20,0" Text="{DynamicResource Setup.Ui.Theme.Color}" />
+                            <WrapPanel Grid.Column="1" x:Name="PanThemeChooser" VerticalAlignment="Center" />
                         </Grid>
                         <Grid Height="28" Margin="0,0,0,7" x:Name="PanCustomColor">
                             <Grid.ColumnDefinitions>
