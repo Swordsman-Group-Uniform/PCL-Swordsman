@@ -3225,7 +3225,7 @@
     <sys:String x:Key="Setup.Ui.Theme.Color.MethylOrange">Methyl Orange</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.AmethystPurple">Amethyst Purple</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.Honey">Honey Yellow</sys:String>
-    <sys:String x:Key="Setup.Ui.Theme.Color.Liuli">Coloured Glass</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Liuli">Coloured Glass Beta</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.Obsidian">Obsidian Black</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.Slime">Slime Green</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.MikuGreen">Miku Green</sys:String>

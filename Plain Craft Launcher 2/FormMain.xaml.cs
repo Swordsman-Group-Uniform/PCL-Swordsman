@@ -706,7 +706,7 @@ public partial class FormMain
     ///         <item>曜石黑 → 黑曜石铺满 + 哭泣黑曜石占右侧 20% 贴图</item>
     ///         <item>蜂蜜黄 → 蜂巢侧面 10% + 蜂巢块 40% + 蜜脾 40% + 蜂箱侧面 10%</item>
     ///         <item>黏液绿 → 整条标题栏的黏液块贴图</item>
-    ///         <item>琉璃彩 → 整窗一块玻璃 + 只在外沿的 8px 玻璃边缘 + 玻璃内部粒子 + 逐帧流动渐变</item>
+    ///         <item>琉璃彩Beta → 整窗一层流动的彩色渐变（无贴图）+ 小粒子</item>
     ///         <item>肥鱼蓝 → 右上角低透明度的肥鱼像</item>
     ///     </list>
     /// </summary>
@@ -751,7 +751,7 @@ public partial class FormMain
         ImgTitleFormula.Visibility = theme == ColorTheme.MethylOrange ? Visibility.Visible : Visibility.Collapsed;
         ImgTitleFatFish.Visibility = theme == ColorTheme.FatFishBlue ? Visibility.Visible : Visibility.Collapsed;
 
-        // 琉璃彩：整窗一块玻璃（内部纹理）+ 只沿启动器外沿的 8px 原版玻璃边缘 + 玻璃内部粒子
+        // 琉璃彩Beta：整窗一层流动的彩色渐变（不用任何贴图）+ 小粒子
         ModLiuliGlass.SetEnabled(theme == ColorTheme.LiuliGlass);
     }
 
@@ -767,7 +767,7 @@ public partial class FormMain
     }
 
     /// <summary>
-    ///     曜石黑标题栏的混铺配方：黑曜石 80% + 哭泣黑曜石 20%。
+    ///     曜石黑标题栏的密铺配方：黑曜石 80% + 哭泣黑曜石 20%（每格按概率随机抽）。
     /// </summary>
     private static readonly (string FileName, double Weight)[] ObsidianMosaicLayers =
     [
@@ -776,10 +776,10 @@ public partial class FormMain
     ];
 
     /// <summary>
-    ///     蜂蜜黄标题栏的混铺配方：蜂巢块 40% + 蜜脾块 40% + 蜂巢侧面 10% + 蜂箱侧面 10%。
+    ///     蜂蜜黄标题栏的密铺配方：蜂巢块 40% + 蜜脾块 40% + 蜂巢侧面 10% + 蜂箱侧面 10%。
     ///     <para>
-    ///         注意这里的「蜂巢块」是**蜂巢（bee_nest）的顶面贴图**，`蜜脾块` 才是 `honeycomb_block`；
-    ///         用户要的是「按比例混在一起」，不是切成几条分带，所以比例只体现在随机出现概率上。
+    ///         注意这里的「蜂巢块」是**蜂巢（bee_nest）的顶面贴图**，`蜜脾块` 才是 `honeycomb_block`。
+    ///         用户要的是「随机混在一起 + 密铺不重叠」，所以比例只体现在每一格的抽取概率上。
     ///     </para>
     /// </summary>
     private static readonly (string FileName, double Weight)[] HoneyMosaicLayers =
@@ -794,7 +794,7 @@ public partial class FormMain
     private string? _titleMosaicSignature;
 
     /// <summary>
-    ///     按当前主题把标题栏的贴图**随机杂乱混铺**成一张图（曜石黑 / 蜂蜜黄）。
+    ///     按当前主题把标题栏的贴图**随机密铺**成一张图（曜石黑 / 蜂蜜黄）。
     ///     标题栏尺寸变化时会被 <see cref="PanTitle_SizeChanged" /> 再调一次。
     /// </summary>
     private void RefreshTitleMosaic()
@@ -830,7 +830,7 @@ public partial class FormMain
         if (theme == ColorTheme.ObsidianBlack) RectTitleObsidian.Fill = brush;
         else RectTitleHoney.Fill = brush;
 
-        ModBase.Log($"[Theme] 标题栏贴图已随机混铺：{string.Join(" / ", layers.Select(l => $"{l.FileName} {l.Weight:P0}"))}" +
+        ModBase.Log($"[Theme] 标题栏贴图已随机密铺：{string.Join(" / ", layers.Select(l => $"{l.FileName} {l.Weight:P0}"))}" +
                     $"（{(int)width}×{(int)height}）", ModBase.LogLevel.Debug);
     }
 

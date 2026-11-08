@@ -72,7 +72,7 @@ public sealed class PluginCustomThemeDefinition
 `SakuraPink=12`、`NetherRed=13`、`MethylOrange=14`、`AmethystPurple=15`、`PluginDefined=16`、
 `LiuliGlass=17`、`ObsidianBlack=18`、`HoneyYellow=19`、`SlimeGreen=20`。
 
-> 17~20 是 snapshot-86 新增的四个「原版贴图主题」：琉璃彩（整窗一块连续玻璃 + 只在外沿的 8px 玻璃边框 + 逐帧彩色渐变，四层不透明度锁 30%）、
+> 17~20 是 snapshot-86 新增的四个「原版贴图主题」：琉璃彩Beta（显示名「琉璃彩Beta」；整窗一层逐帧流动的彩色渐变、不用贴图，四层不透明度锁 30%）、
 > 曜石黑、蜂蜜黄、黏液绿（后三个把原版方块贴图平铺在标题栏上）。它们都要求启用扩展主题功能键。
 
 配色分派（`ThemeService._CalculateColors`）：

@@ -30,26 +30,15 @@ internal static class ModTitleTextures
 
     /// <summary>
     ///     取一张方块贴图的平铺画刷（<c>Glass.png</c> 这种文件名，不带目录）。
-    ///     贴图缺失时返回 <see langword="null" />，调用方应跳过这一层。
+    ///     贴图缺失时返回 <see langword="null" />，调用方跳过这一层即可。
     /// </summary>
     public static Brush? GetTiled(string fileName)
     {
         if (Cache.TryGetValue(fileName, out var cached)) return cached;
 
-        var brush = BuildBrush(fileName, false);
+        var brush = BuildBrush(fileName);
         Cache[fileName] = brush;
         return brush;
-    }
-
-    /// <summary>
-    ///     同上，但贴图缺失时用同色棋盘兜底（玻璃边缘这种「没有就不完整」的层用得上）。
-    /// </summary>
-    public static Brush GetTiledOrFallback(string fileName)
-    {
-        if (Cache.TryGetValue(fileName, out var cached) && cached is not null) return cached;
-
-        var brush = Cache[fileName] = BuildBrush(fileName, true);
-        return brush!;
     }
 
     /// <summary>取一张方块贴图的位图（<c>Glass.png</c> 这种文件名）。加载失败返回 null。</summary>
@@ -94,11 +83,11 @@ internal static class ModTitleTextures
     private static readonly Dictionary<string, TilePixels?> PixelCache = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    ///     把若干张贴图**随机杂乱混铺**成一张 <paramref name="width" />×<paramref name="height" /> 的位图。
+    ///     把若干张贴图**随机密铺**成一张 <paramref name="width" />×<paramref name="height" /> 的位图。
     ///     <para>
-    ///         用户明确要求：贴图要「随机杂乱混合」，不能按比例切成一条条整齐的分带。
-    ///         这里按 16×16 的原版贴图块大小铺网格（保证铺满、不留洞），每格**按权重随机**挑一张贴图，
-    ///         再叠一层随机偏移 0~1 个格子的错位块打破网格感 —— 看起来就是一堵乱砌的方块墙。
+    ///         用户要求：贴图要随机混在一起，但必须**密铺** —— 一个个 16×16 的方块严丝合缝地铺满，
+    ///         **不重叠、不留缝、不错位**（不是按比例分带，也不是叠着乱砌）。
+    ///         所以这里就是「整齐的 16×16 网格 + 每格按权重随机挑一张贴图」。
     ///         <paramref name="layers" /> 里的权重只决定**出现概率**（例如 40/40/10/10）。
     ///     </para>
     ///     <para>
@@ -125,23 +114,10 @@ internal static class ModTitleTextures
 
         var tileSize = (int)TileSize; // 16
 
-        // ① 先按 16×16 网格铺满一遍（保证没有空洞）；奇数行错开半格，像砌砖一样不齐
-        var rowIndex = 0;
-        for (var y = 0; y < pixelHeight; y += tileSize, rowIndex++)
-        {
-            var rowOffset = (rowIndex & 1) == 0 ? 0 : -tileSize / 2;
-            for (var x = rowOffset; x < pixelWidth; x += tileSize)
-                Blit(canvas, stride, pixelWidth, pixelHeight, Pick(tiles, random), x, y);
-        }
-
-        // ② 再撒一层错位的块，打破网格、制造「乱砌」的层次
-        var jitterCount = Math.Max(4, pixelWidth / tileSize * pixelHeight / tileSize / 2);
-        for (var i = 0; i < jitterCount; i++)
-        {
-            var x = random.Next(-tileSize, Math.Max(1, pixelWidth)) + random.Next(-6, 7);
-            var y = random.Next(-tileSize, Math.Max(1, pixelHeight)) + random.Next(-6, 7);
+        // 16×16 网格逐格填满：每格只铺一次，位置严格对齐（不重叠、不留缝）
+        for (var y = 0; y < pixelHeight; y += tileSize)
+        for (var x = 0; x < pixelWidth; x += tileSize)
             Blit(canvas, stride, pixelWidth, pixelHeight, Pick(tiles, random), x, y);
-        }
 
         var bitmap = BitmapSource.Create(pixelWidth, pixelHeight, 96d, 96d,
             PixelFormats.Bgra32, null, canvas, stride);
@@ -219,15 +195,12 @@ internal static class ModTitleTextures
         return brush;
     }
 
-    private static Brush? BuildBrush(string fileName, bool useFallback)
+    private static Brush? BuildBrush(string fileName)
     {
         var bitmap = GetBitmap(fileName);
-        if (bitmap is null && !useFallback) return null;
+        if (bitmap is null) return null;
 
-        // 兜底：贴图缺失时用一张 16×16 同色棋盘，至少让「有这层装饰」在视觉上成立
-        var source = bitmap ?? BuildFallbackBitmap(fileName);
-
-        var brush = new ImageBrush(source)
+        var brush = new ImageBrush(bitmap)
         {
             TileMode = TileMode.Tile,
             Viewport = new System.Windows.Rect(0d, 0d, TileSize, TileSize),
@@ -236,49 +209,6 @@ internal static class ModTitleTextures
         };
         brush.Freeze();
         return brush;
-    }
-
-    /// <summary>
-    ///     贴图缺失时的兜底色：按主题贴图的**已知主色**画一张 16×16 的棋盘，
-    ///     保证装饰层还是有一层色，不至于整块空掉。
-    /// </summary>
-    private static BitmapSource BuildFallbackBitmap(string fileName)
-    {
-        var (r, g, b) = fileName.ToLowerInvariant() switch
-        {
-            "netherwartblock.png" => ((byte)0xB3, (byte)0x39, (byte)0x2E),   // 下界红
-            "amethystblock.png" => ((byte)0x9A, (byte)0x5C, (byte)0xE0),     // 水晶紫
-            "obsidian.png" => ((byte)0x10, (byte)0x0C, (byte)0x1C),          // 曜石黑
-            "cryingobsidian.png" => ((byte)0x45, (byte)0x1E, (byte)0x8C),    // 哭泣黑曜石
-            "honeycombblock.png" => ((byte)0xE8, (byte)0x8C, (byte)0x08),    // 蜂蜜黄：蜜脾块
-            "beenesttop.png" => ((byte)0xFA, (byte)0xAB, (byte)0x1C),        // 蜂蜜黄：蜂巢块（蜂巢顶面）
-            "honeycomb.png" => ((byte)0xEA, (byte)0x8E, (byte)0x16),         // 蜜脾（只用于取色）
-            "beenesside.png" => ((byte)0xC8, (byte)0x6A, (byte)0x08),
-            "beehiveside.png" => ((byte)0xD8, (byte)0x78, (byte)0x03),
-            "slimeblock.png" => ((byte)0x73, (byte)0xC2, (byte)0x62),        // 黏液绿
-            "glass.png" => ((byte)0xA8, (byte)0xD0, (byte)0xD9),             // 琉璃彩
-            "glasspanetop.png" => ((byte)0xA8, (byte)0xD0, (byte)0xD9),
-            _ => ((byte)0x80, (byte)0x80, (byte)0x80)
-        };
-
-        const int size = 16;
-        var pixels = new byte[size * size * 4];
-        for (var y = 0; y < size; y++)
-        for (var x = 0; x < size; x++)
-        {
-            // 16×16 里每 2px 一块的棋盘，深浅差 18，看得出是「纹理」而不是一块纯色
-            var light = ((x / 2 + y / 2) & 1) == 0;
-            var delta = light ? 18 : 0;
-            var i = (y * size + x) * 4;
-            pixels[i] = (byte)Math.Clamp(b + delta, 0, 255);
-            pixels[i + 1] = (byte)Math.Clamp(g + delta, 0, 255);
-            pixels[i + 2] = (byte)Math.Clamp(r + delta, 0, 255);
-            pixels[i + 3] = 255;
-        }
-
-        var bitmap = BitmapSource.Create(size, size, 96d, 96d, PixelFormats.Bgra32, null, pixels, size * 4);
-        bitmap.Freeze();
-        return bitmap;
     }
 
     /// <summary>

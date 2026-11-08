@@ -140,12 +140,16 @@
                     <!-- 「水晶紫」主题的装饰：整条标题栏铺一层低透明度的**原版**紫水晶块贴图
                          （assets/minecraft/textures/block/amethyst_block.png，16×16 原尺寸平铺） -->
                     <Rectangle x:Name="RectTitleAmethyst" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.28" />
-                    <!-- 「曜石黑」：黑曜石 + 哭泣黑曜石**随机杂乱混铺**（哭泣黑曜石约 20%），
-                         不是整齐分带 —— 混铺图由 ModTitleMosaic 运行时按 16×16 贴图块随机拼出来 -->
-                    <Rectangle x:Name="RectTitleObsidian" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.34" />
+                    <!-- 「曜石黑」：黑曜石 + 哭泣黑曜石**随机密铺**（哭泣黑曜石约 20%），
+                         一个个 16×16 方块严丝合缝铺满、不重叠也不留缝 ——
+                         图由 ModTitleTextures.BuildMosaic* 运行时按 16×16 随机拼出来
+                         （NearestNeighbor：非整数 DPI 下也保持像素感，不糊） -->
+                    <Rectangle x:Name="RectTitleObsidian" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.34"
+                               RenderOptions.BitmapScalingMode="NearestNeighbor" />
                     <!-- 「蜂蜜黄」：蜂巢块 40% + 蜜脾块 40% + 蜂巢侧面 10% + 蜂箱侧面 10%，
-                         同样是随机杂乱混铺（比例只体现在出现概率上，不是分带宽） -->
-                    <Rectangle x:Name="RectTitleHoney" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.32" />
+                         同样是随机密铺（比例只体现在每一格的抽取概率上） -->
+                    <Rectangle x:Name="RectTitleHoney" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.32"
+                               RenderOptions.BitmapScalingMode="NearestNeighbor" />
                     <!-- 「黏液绿」：整条标题栏铺一层原版黏液块贴图 -->
                     <Rectangle x:Name="RectTitleSlime" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.30" />
                     <!-- 「剑客黄」主题的装饰：黄昏圣光渐变 -->
