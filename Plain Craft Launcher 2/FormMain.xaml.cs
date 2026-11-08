@@ -706,7 +706,7 @@ public partial class FormMain
     ///         <item>曜石黑 → 黑曜石铺满 + 哭泣黑曜石占右侧 20% 贴图</item>
     ///         <item>蜂蜜黄 → 蜂巢侧面 10% + 蜂巢块 40% + 蜜脾 40% + 蜂箱侧面 10%</item>
     ///         <item>黏液绿 → 整条标题栏的黏液块贴图</item>
-    ///         <item>琉璃彩 → 三块大玻璃 + 8px 玻璃边缘 + 玻璃内部粒子 + 逐帧流动渐变</item>
+    ///         <item>琉璃彩 → 整窗一块玻璃 + 只在外沿的 8px 玻璃边缘 + 玻璃内部粒子 + 逐帧流动渐变</item>
     ///         <item>肥鱼蓝 → 右上角低透明度的肥鱼像</item>
     ///     </list>
     /// </summary>
@@ -736,27 +736,12 @@ public partial class FormMain
         FillTitleTexture(RectTitleAmethyst, isAmethyst, "AmethystBlock.png");
         RectTitleAmethyst.Visibility = isAmethyst ? Visibility.Visible : Visibility.Collapsed;
 
-        // 曜石黑：黑曜石铺满 + 哭泣黑曜石占 20%（用户要求的比例）
+        // 曜石黑 / 蜂蜜黄：贴图**随机杂乱混铺**（比例只决定出现概率，不是整齐分带）
         var isObsidian = theme == ColorTheme.ObsidianBlack;
-        if (isObsidian)
-        {
-            FillTitleTexture(RectTitleObsidian, true, "Obsidian.png");
-            FillTitleTexture(RectTitleCryingObsidian, true, "CryingObsidian.png");
-        }
-
-        GridTitleObsidian.Visibility = isObsidian ? Visibility.Visible : Visibility.Collapsed;
-
-        // 蜂蜜黄：蜂巢块 40% + 蜜脾 40% 打底，两侧各 10% 是蜂巢 / 蜂箱的侧面贴图
+        RectTitleObsidian.Visibility = isObsidian ? Visibility.Visible : Visibility.Collapsed;
         var isHoney = theme == ColorTheme.HoneyYellow;
-        if (isHoney)
-        {
-            FillTitleTexture(RectTitleBeeNest, true, "BeeNestSide.png");
-            FillTitleTexture(RectTitleHoneycombBlock, true, "HoneycombBlock.png");
-            FillTitleTexture(RectTitleHoneycomb, true, "Honeycomb.png");
-            FillTitleTexture(RectTitleBeehive, true, "BeehiveSide.png");
-        }
-
-        GridTitleHoney.Visibility = isHoney ? Visibility.Visible : Visibility.Collapsed;
+        RectTitleHoney.Visibility = isHoney ? Visibility.Visible : Visibility.Collapsed;
+        RefreshTitleMosaic();
 
         // 黏液绿：黏液块铺满标题栏
         var isSlime = theme == ColorTheme.SlimeGreen;
@@ -766,7 +751,7 @@ public partial class FormMain
         ImgTitleFormula.Visibility = theme == ColorTheme.MethylOrange ? Visibility.Visible : Visibility.Collapsed;
         ImgTitleFatFish.Visibility = theme == ColorTheme.FatFishBlue ? Visibility.Visible : Visibility.Collapsed;
 
-        // 琉璃彩：三块大玻璃（标题栏 / 侧边栏 / 主界面）+ 8px 原版玻璃边缘 + 玻璃内部粒子
+        // 琉璃彩：整窗一块玻璃（内部纹理）+ 只沿启动器外沿的 8px 原版玻璃边缘 + 玻璃内部粒子
         ModLiuliGlass.SetEnabled(theme == ColorTheme.LiuliGlass);
     }
 
@@ -779,6 +764,74 @@ public partial class FormMain
         var brush = ModTitleTextures.GetTiled(fileName);
         if (brush is null || ReferenceEquals(shape.Fill, brush)) return;
         shape.Fill = brush;
+    }
+
+    /// <summary>
+    ///     曜石黑标题栏的混铺配方：黑曜石 80% + 哭泣黑曜石 20%。
+    /// </summary>
+    private static readonly (string FileName, double Weight)[] ObsidianMosaicLayers =
+    [
+        ("Obsidian.png", 0.8d),
+        ("CryingObsidian.png", 0.2d)
+    ];
+
+    /// <summary>
+    ///     蜂蜜黄标题栏的混铺配方：蜂巢块 40% + 蜜脾块 40% + 蜂巢侧面 10% + 蜂箱侧面 10%。
+    ///     <para>
+    ///         注意这里的「蜂巢块」是**蜂巢（bee_nest）的顶面贴图**，`蜜脾块` 才是 `honeycomb_block`；
+    ///         用户要的是「按比例混在一起」，不是切成几条分带，所以比例只体现在随机出现概率上。
+    ///     </para>
+    /// </summary>
+    private static readonly (string FileName, double Weight)[] HoneyMosaicLayers =
+    [
+        ("BeeNestTop.png", 0.4d),
+        ("HoneycombBlock.png", 0.4d),
+        ("BeeNestSide.png", 0.1d),
+        ("BeehiveSide.png", 0.1d)
+    ];
+
+    /// <summary>上一次混铺的参数（主题 + 标题栏尺寸），避免每次 SizeChanged 都重拼。</summary>
+    private string? _titleMosaicSignature;
+
+    /// <summary>
+    ///     按当前主题把标题栏的贴图**随机杂乱混铺**成一张图（曜石黑 / 蜂蜜黄）。
+    ///     标题栏尺寸变化时会被 <see cref="PanTitle_SizeChanged" /> 再调一次。
+    /// </summary>
+    private void RefreshTitleMosaic()
+    {
+        if (PanTitle is null || RectTitleObsidian is null || RectTitleHoney is null) return;
+
+        var theme = ThemeService.CurrentTheme;
+        var layers = theme switch
+        {
+            ColorTheme.ObsidianBlack => ObsidianMosaicLayers,
+            ColorTheme.HoneyYellow => HoneyMosaicLayers,
+            _ => null
+        };
+        if (layers is null)
+        {
+            _titleMosaicSignature = null;
+            return;
+        }
+
+        var width = PanTitle.ActualWidth;
+        var height = PanTitle.ActualHeight;
+        if (width < 4d || height < 4d) return; // 还没布局完，等 SizeChanged
+
+        var signature = $"{theme}:{(int)Math.Round(width)}x{(int)Math.Round(height)}";
+        if (signature == _titleMosaicSignature) return;
+        _titleMosaicSignature = signature;
+
+        // 半透明贴图（黏液块那种）也走同一条路径，缺贴图时 BuildMosaicBrush 返回 null，
+        // 那一层就留空，不会影响其它装饰
+        var brush = ModTitleTextures.BuildMosaicBrush(width, height, layers);
+        if (brush is null) return;
+
+        if (theme == ColorTheme.ObsidianBlack) RectTitleObsidian.Fill = brush;
+        else RectTitleHoney.Fill = brush;
+
+        ModBase.Log($"[Theme] 标题栏贴图已随机混铺：{string.Join(" / ", layers.Select(l => $"{l.FileName} {l.Weight:P0}"))}" +
+                    $"（{(int)width}×{(int)height}）", ModBase.LogLevel.Debug);
     }
 
     /// <summary>
@@ -837,6 +890,9 @@ public partial class FormMain
             PanTitleLeft.ColumnDefinitions[0].MaxWidth = 0;
         else
             PanTitleLeft.ColumnDefinitions[0].MaxWidth = PanTitleMain.ColumnDefinitions[0].ActualWidth - 30;
+
+        // 混铺图的尺寸跟标题栏一样大，标题栏变了要按新尺寸重拼（其它主题会自己早退）
+        RefreshTitleMosaic();
     }
 
     // 最小化

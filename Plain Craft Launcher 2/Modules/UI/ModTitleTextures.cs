@@ -62,6 +62,163 @@ internal static class ModTitleTextures
         return bitmap;
     }
 
+    /// <summary>
+    ///     取一张方块贴图的 BGRA32 像素（16×16，行宽 <c>Width*4</c>）。
+    ///     用于 <see cref="BuildMosaic" /> 逐块拼图；贴图缺失返回 <see langword="null" />。
+    /// </summary>
+    public static TilePixels? GetPixels(string fileName)
+    {
+        if (PixelCache.TryGetValue(fileName, out var cached)) return cached;
+
+        TilePixels? result = null;
+        var bitmap = GetBitmap(fileName);
+        if (bitmap is not null)
+        {
+            var converted = new FormatConvertedBitmap(bitmap, PixelFormats.Bgra32, null, 0d);
+            converted.Freeze();
+            var width = converted.PixelWidth;
+            var height = converted.PixelHeight;
+            var stride = width * 4;
+            var buffer = new byte[stride * height];
+            converted.CopyPixels(buffer, stride, 0);
+            result = new TilePixels(width, height, stride, buffer);
+        }
+
+        PixelCache[fileName] = result;
+        return result;
+    }
+
+    /// <summary>一张贴图的像素数据（BGRA32）。</summary>
+    public sealed record TilePixels(int Width, int Height, int Stride, byte[] Bgra);
+
+    private static readonly Dictionary<string, TilePixels?> PixelCache = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    ///     把若干张贴图**随机杂乱混铺**成一张 <paramref name="width" />×<paramref name="height" /> 的位图。
+    ///     <para>
+    ///         用户明确要求：贴图要「随机杂乱混合」，不能按比例切成一条条整齐的分带。
+    ///         这里按 16×16 的原版贴图块大小铺网格（保证铺满、不留洞），每格**按权重随机**挑一张贴图，
+    ///         再叠一层随机偏移 0~1 个格子的错位块打破网格感 —— 看起来就是一堵乱砌的方块墙。
+    ///         <paramref name="layers" /> 里的权重只决定**出现概率**（例如 40/40/10/10）。
+    ///     </para>
+    ///     <para>
+    ///         用 <paramref name="seed" /> 固定随机数，同一主题同一尺寸的结果稳定（窗口拖动重算时不会闪）。
+    ///     </para>
+    /// </summary>
+    public static BitmapSource? BuildMosaic(double width, double height,
+        IReadOnlyList<(string FileName, double Weight)> layers, int seed = 20261108)
+    {
+        var pixelWidth = (int)Math.Ceiling(Math.Max(0d, width));
+        var pixelHeight = (int)Math.Ceiling(Math.Max(0d, height));
+        if (pixelWidth < 4 || pixelHeight < 4) return null;
+
+        var tiles = layers
+            .Select(layer => (Layer: layer, Pixels: GetPixels(layer.FileName)))
+            .Where(item => item.Pixels is not null && item.Layer.Weight > 0d)
+            .Select(item => (item.Layer.Weight, item.Layer.FileName, item.Pixels!))
+            .ToArray();
+        if (tiles.Length == 0) return null;
+
+        var stride = pixelWidth * 4;
+        var canvas = new byte[stride * pixelHeight];
+        var random = new Random(seed);
+
+        var tileSize = (int)TileSize; // 16
+
+        // ① 先按 16×16 网格铺满一遍（保证没有空洞）；奇数行错开半格，像砌砖一样不齐
+        var rowIndex = 0;
+        for (var y = 0; y < pixelHeight; y += tileSize, rowIndex++)
+        {
+            var rowOffset = (rowIndex & 1) == 0 ? 0 : -tileSize / 2;
+            for (var x = rowOffset; x < pixelWidth; x += tileSize)
+                Blit(canvas, stride, pixelWidth, pixelHeight, Pick(tiles, random), x, y);
+        }
+
+        // ② 再撒一层错位的块，打破网格、制造「乱砌」的层次
+        var jitterCount = Math.Max(4, pixelWidth / tileSize * pixelHeight / tileSize / 2);
+        for (var i = 0; i < jitterCount; i++)
+        {
+            var x = random.Next(-tileSize, Math.Max(1, pixelWidth)) + random.Next(-6, 7);
+            var y = random.Next(-tileSize, Math.Max(1, pixelHeight)) + random.Next(-6, 7);
+            Blit(canvas, stride, pixelWidth, pixelHeight, Pick(tiles, random), x, y);
+        }
+
+        var bitmap = BitmapSource.Create(pixelWidth, pixelHeight, 96d, 96d,
+            PixelFormats.Bgra32, null, canvas, stride);
+        bitmap.Freeze();
+        return bitmap;
+    }
+
+    /// <summary>按权重随机挑一张贴图。</summary>
+    private static TilePixels Pick((double Weight, string FileName, TilePixels Pixels)[] tiles, Random random)
+    {
+        var total = tiles.Sum(tile => tile.Weight);
+        var roll = random.NextDouble() * total;
+        foreach (var tile in tiles)
+        {
+            roll -= tile.Weight;
+            if (roll <= 0d) return tile.Pixels;
+        }
+
+        return tiles[^1].Pixels;
+    }
+
+    /// <summary>把一张 16×16 贴图按 src-over 混合贴到画布的 (offsetX, offsetY)（允许越界，自动裁剪）。</summary>
+    private static void Blit(byte[] canvas, int dstStride, int dstWidth, int dstHeight, TilePixels tile,
+        int offsetX, int offsetY)
+    {
+        for (var y = 0; y < tile.Height; y++)
+        {
+            var dy = offsetY + y;
+            if (dy < 0 || dy >= dstHeight) continue;
+
+            for (var x = 0; x < tile.Width; x++)
+            {
+                var dx = offsetX + x;
+                if (dx < 0 || dx >= dstWidth) continue;
+
+                var si = y * tile.Stride + x * 4;
+                var di = dy * dstStride + dx * 4;
+                var alpha = tile.Bgra[si + 3];
+
+                if (alpha == 255)
+                {
+                    canvas[di] = tile.Bgra[si];
+                    canvas[di + 1] = tile.Bgra[si + 1];
+                    canvas[di + 2] = tile.Bgra[si + 2];
+                    canvas[di + 3] = 255;
+                }
+                else if (alpha > 0)
+                {
+                    // 半透明贴图（黏液块那种）：普通 src-over
+                    double a = alpha / 255d;
+                    double d = canvas[di + 3] / 255d;
+                    var outA = a + d * (1d - a);
+                    if (outA <= 0d) continue;
+                    canvas[di] = (byte)Math.Round((tile.Bgra[si] * a + canvas[di] * d * (1d - a)) / outA);
+                    canvas[di + 1] = (byte)Math.Round((tile.Bgra[si + 1] * a + canvas[di + 1] * d * (1d - a)) / outA);
+                    canvas[di + 2] = (byte)Math.Round((tile.Bgra[si + 2] * a + canvas[di + 2] * d * (1d - a)) / outA);
+                    canvas[di + 3] = (byte)Math.Round(outA * 255d);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    ///     把混铺结果做成一条铺满整个矩形的画刷（<see cref="TileMode.None" />，
+    ///     因为图本身就是按目标尺寸拼好的）。
+    /// </summary>
+    public static Brush? BuildMosaicBrush(double width, double height,
+        IReadOnlyList<(string FileName, double Weight)> layers, int seed = 20261108)
+    {
+        var bitmap = BuildMosaic(width, height, layers, seed);
+        if (bitmap is null) return null;
+
+        var brush = new ImageBrush(bitmap) { Stretch = Stretch.Fill, TileMode = TileMode.None };
+        brush.Freeze();
+        return brush;
+    }
+
     private static Brush? BuildBrush(string fileName, bool useFallback)
     {
         var bitmap = GetBitmap(fileName);
@@ -93,8 +250,9 @@ internal static class ModTitleTextures
             "amethystblock.png" => ((byte)0x9A, (byte)0x5C, (byte)0xE0),     // 水晶紫
             "obsidian.png" => ((byte)0x10, (byte)0x0C, (byte)0x1C),          // 曜石黑
             "cryingobsidian.png" => ((byte)0x45, (byte)0x1E, (byte)0x8C),    // 哭泣黑曜石
-            "honeycombblock.png" => ((byte)0xE8, (byte)0x8C, (byte)0x08),    // 蜂蜜黄
-            "honeycomb.png" => ((byte)0xEA, (byte)0x8E, (byte)0x16),         // 蜜脾
+            "honeycombblock.png" => ((byte)0xE8, (byte)0x8C, (byte)0x08),    // 蜂蜜黄：蜜脾块
+            "beenesttop.png" => ((byte)0xFA, (byte)0xAB, (byte)0x1C),        // 蜂蜜黄：蜂巢块（蜂巢顶面）
+            "honeycomb.png" => ((byte)0xEA, (byte)0x8E, (byte)0x16),         // 蜜脾（只用于取色）
             "beenesside.png" => ((byte)0xC8, (byte)0x6A, (byte)0x08),
             "beehiveside.png" => ((byte)0xD8, (byte)0x78, (byte)0x03),
             "slimeblock.png" => ((byte)0x73, (byte)0xC2, (byte)0x62),        // 黏液绿

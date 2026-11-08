@@ -17,8 +17,9 @@
     Plain Craft Launcher 2/Images/Blocks/GlassPaneTop.png         玻璃板顶边（「琉璃彩」8px 边缘）
     Plain Craft Launcher 2/Images/Blocks/Obsidian.png             黑曜石（「曜石黑」80%）
     Plain Craft Launcher 2/Images/Blocks/CryingObsidian.png       哭泣黑曜石（「曜石黑」20%）
-    Plain Craft Launcher 2/Images/Blocks/HoneycombBlock.png       蜂巢块（「蜂蜜黄」40%）
-    Plain Craft Launcher 2/Images/Blocks/Honeycomb.png            蜜脾（「蜂蜜黄」40%，注意是 item/honeycomb）
+    Plain Craft Launcher 2/Images/Blocks/HoneycombBlock.png       蜜脾块（「蜂蜜黄」40%，honeycomb_block）
+    Plain Craft Launcher 2/Images/Blocks/BeeNestTop.png           蜂巢块 = 蜂巢顶面（「蜂蜜黄」40%，bee_nest_top）
+    Plain Craft Launcher 2/Images/Blocks/Honeycomb.png            蜜脾（「蜂蜜黄」只用于取主色，item/honeycomb）
     Plain Craft Launcher 2/Images/Blocks/BeeNestSide.png          蜂巢侧面（「蜂蜜黄」10%）
     Plain Craft Launcher 2/Images/Blocks/BeehiveSide.png          蜂箱侧面（「蜂蜜黄」10%）
     Plain Craft Launcher 2/Images/Blocks/SlimeBlock.png           黏液块（「黏液绿」）
@@ -39,7 +40,10 @@ BLOCKS = {
     # 「曜石黑」主题
     "assets/minecraft/textures/block/obsidian.png": "Obsidian.png",
     "assets/minecraft/textures/block/crying_obsidian.png": "CryingObsidian.png",
-    # 「蜂蜜黄」主题（蜂巢块 / 蜜脾 / 蜂巢侧面 / 蜂箱侧面）
+    # 「蜂蜜黄」主题（蜂巢块 / 蜜脾块 / 蜂巢侧面 / 蜂箱侧面）
+    # 注意：`蜂巢块` 取的是**蜂巢（bee_nest）的顶面**贴图；`蜜脾块` 才是 honeycomb_block。
+    # `item/honeycomb`（蜜脾物品贴图）只用来统计主色，**不**用来铺标题栏。
+    "assets/minecraft/textures/block/bee_nest_top.png": "BeeNestTop.png",
     "assets/minecraft/textures/block/honeycomb_block.png": "HoneycombBlock.png",
     "assets/minecraft/textures/item/honeycomb.png": "Honeycomb.png",
     "assets/minecraft/textures/block/bee_nest_side.png": "BeeNestSide.png",
