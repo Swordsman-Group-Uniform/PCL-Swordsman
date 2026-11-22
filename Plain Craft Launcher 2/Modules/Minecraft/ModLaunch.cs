@@ -220,13 +220,23 @@ public static class ModLaunch
 
     public static bool McLaunchStart(McLaunchOptions options = null)
     {
-        isLaunching = true;
         currentLaunchOptions = options ?? new McLaunchOptions();
         // 插件事件：即将启动（参数还没算，但实例已经确定）
         PublishGameLaunching(currentLaunchOptions);
-        // 预检查
+        // 插件守门（snapshot-89）：让声明了 launch-gate 的插件在启动前检查（Mod 冲突等），
+        // 任一插件返回「拒绝」就取消本次启动。必须在 UI 线程，弹窗才能同步阻塞。
         if (!ModBase.RunInUi())
             throw new Exception("McLaunchStart 必须在 UI 线程调用！");
+        var gateInstance = currentLaunchOptions.instance ?? ModInstanceList.McMcInstanceSelected;
+        if (gateInstance is not null &&
+            !PluginHostBootstrap.RequestLaunchPermission(gateInstance.Name, gateInstance.PathInstance ?? ""))
+        {
+            McLaunchLog("启动已被插件阻止（见插件提示）");
+            isLaunching = false;
+            return false;
+        }
+
+        isLaunching = true;
         if (mcLaunchLoader.State == ModBase.LoadState.Loading)
         {
             HintService.Hint(Lang.Text("Minecraft.Launch.Error.AlreadyLaunching"), HintType.Error);

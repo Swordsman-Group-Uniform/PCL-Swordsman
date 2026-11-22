@@ -1,0 +1,29 @@
+{
+  "id": "pcls.advanced-instance",
+  "name": "高级实例管理",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "minHostVersion": "27.1.1",
+  "author": "剑客群组服服主团队",
+  "description": "存档自动备份、Mod 依赖关系与冲突检查（含启动前警告）、存档基本数据（level.dat）编辑、Litematica 投影适配版本批量修改。外置插件，需手动安装。",
+  "entry": {
+    "assembly": "AdvancedInstance.dll",
+    "type": "AdvancedInstance.AdvancedInstancePlugin"
+  },
+  "capabilities": [
+    "config",
+    "ui.page",
+    "ui.sidebar",
+    "ui.notify",
+    "events",
+    "file-game-dir",
+    "file-user-pick",
+    "minecraft.read",
+    "launch-gate",
+    "instance.mod-panel"
+  ],
+  "ui": {
+    "icon": "lucide/archive",
+    "sortOrder": 20
+  }
+}

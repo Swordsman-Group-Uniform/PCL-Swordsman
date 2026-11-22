@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!--
+        「高级实例管理」插件（外置，需手动安装）。
+        契约程序集由宿主提供，插件不复制 PCL.PluginSdk.dll（否则类型身份分裂）。
+        页面 / 面板用原生 WPF 拼，不引用启动器程序集（引用会加载第二份宿主类型）。
+    -->
+    <PropertyGroup>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
+        <LangVersion>14</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AssemblyName>AdvancedInstance</AssemblyName>
+        <RootNamespace>AdvancedInstance</RootNamespace>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU;x64;ARM64</Platforms>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\PCL.PluginSdk\PCL.PluginSdk.csproj">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="plugin.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+</Project>

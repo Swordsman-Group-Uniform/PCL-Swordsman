@@ -51,5 +51,11 @@ public enum PluginCapability
     ThemesCustom = 1 << 13,
 
     /// <summary>读取 Minecraft 实例信息（<see cref="IMinecraftService" />，只读）。</summary>
-    MinecraftRead = 1 << 14
+    MinecraftRead = 1 << 14,
+
+    /// <summary>启动前守门（<see cref="IPluginLaunchGate" />）：可以在启动前警告并阻止本次启动。</summary>
+    LaunchGate = 1 << 15,
+
+    /// <summary>往「实例 → Mod 管理」页注册面板（<see cref="IPluginInstanceModPanelProvider" />）。</summary>
+    InstanceModPanel = 1 << 16
 }

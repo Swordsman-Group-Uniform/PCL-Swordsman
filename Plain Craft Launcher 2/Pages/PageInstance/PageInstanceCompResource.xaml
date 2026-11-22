@@ -34,6 +34,9 @@
                                             Visibility="Collapsed" />
                         </WrapPanel>
                     </local:MyCard>
+                    <!-- 插件扩展（snapshot-89）：Mod 管理页的插件面板会渲染到这里。
+                         「高级实例管理」插件的 Mod 依赖关系视图就挂在这块（需要 instance.mod-panel 能力）。 -->
+                    <StackPanel x:Name="PanPluginPanels" Margin="0,0,0,15" />
                     <local:MyCard x:Name="PanListBack" VerticalAlignment="Top" Opacity="0" Margin="0,0,0,14" Title=" "
                                   MinHeight="55">
                         <StackPanel x:Name="PanFilter" Margin="15,13,0,0" Orientation="Horizontal"

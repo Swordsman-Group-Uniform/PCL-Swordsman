@@ -7,6 +7,30 @@
 
 > 括号外为下游版本号，括号内为**标注用的**上游版本号（**不追上游同步**，见 `HANDOVER.md` §0.19 / §4.1）。
 
+## snapshot-89：外置插件「高级实例管理」+ 启动前守门 / Mod 管理面板扩展点
+
+### ① 新插件（外置）
+
+`plugins/AdvancedInstance/`（11 个文件，见 §改动清单）：存档自动备份、Mod 依赖检查与启动前警告、
+level.dat 编辑、Litematica 投影版本批量适配。
+打包成 `plugins/dist/AdvancedInstance.pclpkg`，**不进 exe、不进 artifact-x64/plugins/**（手动安装）。
+
+### ② 宿主改动（这是本插件需要的本体改动，全部记录在此）
+
+| 文件 | 改动 |
+| --- | --- |
+| `PCL.PluginSdk/PluginCapability.cs` | 新增 `LaunchGate = 1 << 15`、`InstanceModPanel = 1 << 16` |
+| `PCL.PluginSdk/IPluginLaunchGate.cs` | **新文件**：`IPluginLaunchGate`、`PluginLaunchGateContext`、`PluginLaunchGateResult`、`PluginModPanelDefinition`、`IPluginInstanceModPanelProvider` |
+| `Modules/Plugins/PluginHostBootstrap.cs` | 新增 `RefreshLaunchGates()`（在 `ApplyProvidedFeatures` 末尾调用）、`RequestLaunchPermission()`、`GetModPanels()` |
+| `Modules/Minecraft/ModLaunch.cs` | `McLaunchStart` 在 `isLaunching = true` 之前询问守门，被拒绝则记日志、`isLaunching = false`、返回 false |
+| `Pages/PageInstance/PageInstanceCompResource.xaml` | 新增 `StackPanel x:Name="PanPluginPanels"`（Mod 管理页按钮区下方） |
+| `Pages/PageInstance/PageInstanceCompResource.xaml.cs` | 新增 `RefreshPluginModPanels()`，在 `PageOther_Loaded()` 末尾调用；按实例加载器过滤面板 |
+| `Plain Craft Launcher 2.csproj` | `Exclude` 列表加上 `AdvancedInstance.pclpkg`（不内嵌） |
+| `plugins/package.sh` | 打包列表加上 `AdvancedInstance` |
+| `build.sh` | 非正式版复制插件包时跳过 `AdvancedInstance.pclpkg`（外置） |
+| `metadata.json` | 版本 → `snapshot-89` / `code 615` |
+| `docs/PLUGIN-DEV.md` | 新增 §17.5：两个扩展点的用法与生命周期 |
+
 ## snapshot-88：配色主题改为平铺选择器（仿原版 PCL）
 
 - `PageSetupUI` 里把「配色主题」下拉框（`ComboThemeColor`）换成 `WrapPanel x:Name="PanThemeChooser"`：

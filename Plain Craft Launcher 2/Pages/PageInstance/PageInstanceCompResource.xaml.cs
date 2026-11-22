@@ -242,6 +242,85 @@ public partial class PageInstanceCompResource : IRefreshable
         // 调整按钮边距（这玩意儿没法从 XAML 改）
         foreach (MyRadioButton Btn in PanFilter.Children)
             Btn.LabText.Margin = new Thickness(-2, 0d, 8d, 0d);
+
+        RefreshPluginModPanels();
+    }
+
+    /// <summary>
+    ///     渲染插件提供的 Mod 面板（snapshot-89 新增的宿主扩展点，需要 <c>instance.mod-panel</c> 能力）。
+    ///     目前只有 Mod 管理页有这块区域；其它类型（资源包 / 光影 / 投影）直接隐藏。
+    /// </summary>
+    private void RefreshPluginModPanels()
+    {
+        if (PanPluginPanels is null) return;
+
+        PanPluginPanels.Children.Clear();
+        if (currentCompType != ModComp.CompType.Mod)
+        {
+            PanPluginPanels.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        try
+        {
+            // 加载器名：用实例信息里的布尔标记推（与 Mod 列表筛选同一套来源）
+            var info = PageInstanceLeft.McInstance?.Info;
+            var loaderName = info is null
+                ? ""
+                : info.HasNeoForge ? "NeoForge"
+                : info.HasQuilt ? "Quilt"
+                : info.HasFabric ? "Fabric"
+                : info.HasForge ? "Forge"
+                : "";
+
+            var panels = PluginHostBootstrap.GetModPanels(loaderName);
+            if (panels.Count == 0)
+            {
+                PanPluginPanels.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            foreach (var (descriptor, definition) in panels)
+            {
+                try
+                {
+                    var content = definition.CreatePanel!(descriptor.Context!);
+                    if (content is null) continue;
+
+                    var card = new MyCard
+                    {
+                        Margin = new Thickness(0, 0, 0, 15),
+                        Title = string.IsNullOrWhiteSpace(definition.Title) ? descriptor.Name : definition.Title
+                    };
+                    var body = new StackPanel { Margin = new Thickness(25, 40, 25, 15) };
+                    if (!string.IsNullOrWhiteSpace(definition.Description))
+                        body.Children.Add(new TextBlock
+                        {
+                            Text = definition.Description,
+                            FontSize = 12d,
+                            Opacity = 0.7d,
+                            TextWrapping = TextWrapping.Wrap,
+                            Margin = new Thickness(0, 0, 0, 10)
+                        });
+                    body.Children.Add(content);
+                    card.Children.Add(body);
+                    PanPluginPanels.Children.Add(card);
+                }
+                catch (Exception ex)
+                {
+                    ModBase.Log(ex, $"[Plugin] 渲染 {descriptor.Id} 的 Mod 面板失败", ModBase.LogLevel.Hint);
+                }
+            }
+
+            PanPluginPanels.Visibility = PanPluginPanels.Children.Count > 0
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+        catch (Exception ex)
+        {
+            ModBase.Log(ex, "[Plugin] 渲染 Mod 管理页的插件面板失败", ModBase.LogLevel.Hint);
+            PanPluginPanels.Visibility = Visibility.Collapsed;
+        }
     }
 
     /// <summary>

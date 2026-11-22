@@ -24,7 +24,7 @@ export DOTNET_NOLOGO=1
 
 mkdir -p "$DIST"
 
-for name in SguPack PCLSCore AdvancedMaterials Welcome FadedGray HelloPlugin; do
+for name in SguPack PCLSCore AdvancedMaterials Welcome FadedGray HelloPlugin AdvancedInstance; do
     # HelloPlugin 在 samples/ 下，其余在 plugins/ 下
     if [ "$name" = "HelloPlugin" ]; then
         base="$ROOT/samples/$name"

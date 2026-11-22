@@ -561,6 +561,9 @@ internal static class PluginHostBootstrap
 
             ModWelcome.SetMessages(welcome);
 
+            // 启动前守门（snapshot-89 新增的宿主扩展点）：插件可以在启动前警告 / 阻止本次启动
+            RefreshLaunchGates(manager);
+
             ModBase.Log(
                 $"[PluginHost] 已应用插件功能：{(features.Count == 0 ? "无" : string.Join(", ", features))}",
                 ModBase.LogLevel.Debug);
@@ -575,6 +578,131 @@ internal static class PluginHostBootstrap
             ModBase.Log(ex, "[PluginHost] 应用插件功能失败", ModBase.LogLevel.Debug);
         }
     }
+
+    #region 启动前守门 + Mod 管理页插件面板（snapshot-89 新增的宿主扩展点）
+
+    /// <summary>
+    ///     已加载的启动前守门（插件 id + 实现）。每次 <see cref="ApplyProvidedFeatures" /> 时重建，
+    ///     插件被禁用 / 卸载后自然消失。
+    /// </summary>
+    private static readonly List<(string PluginId, PCL.PluginSdk.IPluginLaunchGate Gate)> LaunchGates = [];
+
+    /// <summary>收集声明了 <c>launch-gate</c> 能力的插件。</summary>
+    private static void RefreshLaunchGates(PluginHostManager manager)
+    {
+        LaunchGates.Clear();
+        try
+        {
+            foreach (var (descriptor, gate) in manager.GetProviderEntries<PCL.PluginSdk.IPluginLaunchGate>())
+            {
+                if ((descriptor.Capabilities & PCL.PluginSdk.PluginCapability.LaunchGate) == 0)
+                {
+                    ModBase.Log($"[Plugin] {descriptor.Id} 实现了启动前守门但没有声明 launch-gate 能力，已忽略",
+                        ModBase.LogLevel.Hint);
+                    continue;
+                }
+
+                LaunchGates.Add((descriptor.Id, gate));
+            }
+
+            if (LaunchGates.Count > 0)
+                ModBase.Log($"[Plugin] 启动前守门：{string.Join(", ", LaunchGates.Select(gate => gate.PluginId))}",
+                    ModBase.LogLevel.Normal);
+        }
+        catch (Exception ex)
+        {
+            ModBase.Log(ex, "[Plugin] 收集启动前守门失败", ModBase.LogLevel.Hint);
+        }
+    }
+
+    /// <summary>
+    ///     在 Minecraft 真正启动之前询问所有插件。任意一个返回
+    ///     <see cref="PCL.PluginSdk.PluginLaunchGateResult.Deny" /> 就取消本次启动。
+    ///     <para>
+    ///         **必须在 UI 线程调用**：插件通常会在守门里弹确认框（宿主的
+    ///         <c>Confirm</c> 在 UI 线程上是同步阻塞的，因此「警告 → 用户选择 → 继续 / 取消」
+    ///         的顺序是确定的）。
+    ///     </para>
+    /// </summary>
+    /// <returns>是否允许启动。被拒绝时已经给过用户提示（插件自己的弹窗或下面这条）。</returns>
+    public static bool RequestLaunchPermission(string instanceName, string instancePath)
+    {
+        if (LaunchGates.Count == 0) return true;
+
+        var context = new PCL.PluginSdk.PluginLaunchGateContext
+        {
+            InstanceName = instanceName ?? "",
+            InstancePath = instancePath ?? ""
+        };
+
+        foreach (var (pluginId, gate) in LaunchGates.ToArray())
+        {
+            try
+            {
+                var result = gate.BeforeLaunch(context);
+                if (result is null || result.Allow) continue;
+
+                ModBase.Log($"[Launch] 启动被插件 {pluginId} 阻止" +
+                            (string.IsNullOrWhiteSpace(result.Message) ? "" : $"：{result.Message}"),
+                    ModBase.LogLevel.Normal);
+                if (!string.IsNullOrWhiteSpace(result.Message))
+                    HintService.Hint(result.Message!, HintType.Error);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                // 守门自己炸了不能连坐启动流程：记日志后放行
+                ModBase.Log(ex, $"[Plugin] {pluginId} 的启动前守门出错（已忽略，继续启动）", ModBase.LogLevel.Hint);
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     取「Mod 管理」页面要渲染的插件面板（需要 <c>instance.mod-panel</c> 能力）。
+    ///     <paramref name="loaderName" /> 用来过滤只在特定加载器下显示的面板。
+    /// </summary>
+    public static IReadOnlyList<(PluginDescriptor Descriptor, PCL.PluginSdk.PluginModPanelDefinition Panel)> GetModPanels(
+        string? loaderName)
+    {
+        var result = new List<(PluginDescriptor, PCL.PluginSdk.PluginModPanelDefinition)>();
+        var manager = Manager;
+        if (manager is null) return result;
+
+        try
+        {
+            foreach (var (descriptor, provider) in manager.GetProviderEntries<PCL.PluginSdk.IPluginInstanceModPanelProvider>())
+            {
+                if ((descriptor.Capabilities & PCL.PluginSdk.PluginCapability.InstanceModPanel) == 0) continue;
+
+                try
+                {
+                    foreach (var panel in provider.GetModPanels())
+                    {
+                        if (string.IsNullOrWhiteSpace(panel.Id) || panel.CreatePanel is null) continue;
+                        if (!string.IsNullOrWhiteSpace(panel.Loader) &&
+                            !string.Equals(panel.Loader, loaderName, StringComparison.OrdinalIgnoreCase))
+                            continue;
+                        result.Add((descriptor, panel));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModBase.Log(ex, $"[Plugin] 读取 {descriptor.Id} 的 Mod 面板失败（已跳过该插件）", ModBase.LogLevel.Hint);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ModBase.Log(ex, "[Plugin] 收集 Mod 管理页插件面板失败", ModBase.LogLevel.Hint);
+        }
+
+        result.Sort((a, b) => a.Item2.SortOrder.CompareTo(b.Item2.SortOrder));
+        return result;
+    }
+
+    #endregion
 
     private sealed class AppPluginEnvironment : IPluginHostEnvironment
     {

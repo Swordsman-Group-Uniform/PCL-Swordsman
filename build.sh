@@ -99,12 +99,13 @@ if [ -f "$SRC" ]; then
         for pkg in "$ROOT"/plugins/dist/*.pclpkg; do
             [ -f "$pkg" ] || continue
             case "$(basename "$pkg")" in
-                # FadedGray（Faded灰主题）按要求**不内置**：只在 dist/ 里放一份供手动安装
-                FadedGray.pclpkg) continue ;;
+                # FadedGray（Faded灰主题）/ AdvancedInstance（高级实例管理）按要求**不内置**：
+                # 只在 dist/ 里放一份供手动安装
+                FadedGray.pclpkg|AdvancedInstance.pclpkg) continue ;;
             esac
             cp -f "$pkg" "$OUT/plugins/" 2>/dev/null || true
         done
-        echo "==> 非正式版构建：已附带插件包（首次启动自动安装；FadedGray 不内置，需手动安装 dist/ 里的那份）"
+        echo "==> 非正式版构建：已附带插件包（首次启动自动安装；FadedGray / AdvancedInstance 不内置，需手动安装 dist/ 里的那份）"
     else
         rm -rf "$OUT/plugins"
         echo "==> 正式版构建：不随包附带插件（插件包已放入 dist/plugins/）"

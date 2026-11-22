@@ -8,6 +8,32 @@
 
 ---
 
+## 27.1.1-snapshot-89 · 外置插件「高级实例管理」+ 两个新扩展点
+
+新增**外置插件**「高级实例管理」（`plugins/AdvancedInstance`，打出来是
+`dist/AdvancedInstance.pclpkg`，需要手动安装到 `PCL\Plugins\`，**不随包内置**）。
+
+### 插件提供的四项功能
+
+1. **存档自动备份**：默认每 30 分钟自动备份一次，每个存档保留最近 10 份；
+   存档被删除后只保留**最后一份**副本，超过 30 天连它一起清理（比例 / 间隔 / 天数都能在插件页面改）。
+   备份是 zip，放在插件数据目录里；恢复时先把现有存档改名成 `<存档名>.old-时间` 再解压。
+2. **Mod 依赖关系与冲突检查**：解析 jar 里的 `fabric.mod.json` / `quilt.mod.json` /
+   `META-INF/mods.toml` / `META-INF/neoforge.mods.toml`，检查**依赖缺失、依赖版本不满足、
+   重复安装、明确声明的不兼容**；结果同时出现在「实例 → Mod 管理」页的面板与插件自己的页面里，
+   **启动前**发现严重问题会弹警告窗，可以选择取消启动。
+3. **存档基本数据（level.dat）编辑**：改存档名、游戏模式、难度、硬核、作弊、天气、世界时间、出生点；
+   其它标签原样保留，写之前自动备份成 `level.dat.bak-时间`。
+4. **Litematica 投影适配版本批量修改**：改 `.litematic` 里的 `Version` 字段（平时要用 NBTExplorer 改的那个），
+   支持一次改一整个文件夹；可选同时改 `MinecraftDataVersion`。
+   **第一次使用**会弹风险提示（含「在更改版本前创建备份」勾选框，默认勾上）。
+
+### 为插件新增的两个宿主扩展点（详细说明见 `docs/PLUGIN-DEV.md` §17.5）
+
+- **`IPluginLaunchGate`（能力 `launch-gate`）**：启动前守门，`McLaunchStart` 里同步调用，
+  插件返回 `Deny` 即可取消本次启动；插件抛异常只记日志、不拦启动。
+- **`IPluginInstanceModPanelProvider`（能力 `instance.mod-panel`）**：往「Mod 管理」页注册面板卡片。
+
 ## 27.1.1-snapshot-88 · 配色主题改为平铺选择器（仿原版 PCL）
 
 - 设置 → 界面 的「配色主题」不再是下拉框，改成**仿原版 PCL 的平铺选择器**：

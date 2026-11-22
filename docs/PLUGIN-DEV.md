@@ -637,6 +637,61 @@ private string T(string key) =>
 
 ---
 
+## 17.5 实例级扩展点：启动前守门与 Mod 管理面板（snapshot-89）
+
+这两条扩展点是给「高级实例管理」插件加的，其它插件也可以直接用。
+
+### 17.5.1 启动前守门 `IPluginLaunchGate`
+
+清单能力：`launch-gate`（`PluginCapability.LaunchGate`）。
+
+```csharp
+public sealed class MyGate : IPluginLaunchGate
+{
+    public PluginLaunchGateResult? BeforeLaunch(PluginLaunchGateContext context)
+    {
+        // context.InstanceName / InstancePath 一定有值；其余字段由插件自己从实例目录读
+        if (没发现问题) return null;                     // null = 不干预
+        var ok = 弹出确认框问用户();                       // 在 UI 线程，可以同步弹窗
+        return ok ? PluginLaunchGateResult.Permit() : PluginLaunchGateResult.Deny("已取消启动");
+    }
+}
+```
+
+宿主的调用时机：`McLaunchStart` 里、`isLaunching = true` **之前**，UI 线程同步调用。
+任一插件返回 `Deny` → 本次启动被取消（`McLaunchStart` 返回 false），
+`Message` 非空时宿主会用右下角提示显示它；后面的守门插件不再被询问。
+守门自己抛异常 → 记日志后放行，不连坐启动。
+日志：`[Plugin] 启动前守门：<id>` / `[Launch] 启动被插件 <id> 阻止：<原因>`。
+
+### 17.5.2 Mod 管理页面板 `IPluginInstanceModPanelProvider`
+
+清单能力：`instance.mod-panel`（`PluginCapability.InstanceModPanel`）。
+
+```csharp
+public IReadOnlyList<PluginModPanelDefinition> GetModPanels() =>
+[
+    new()
+    {
+        Id = "my.mod-panel",
+        Title = "依赖检查",
+        Description = "一句话说明（可空）",
+        SortOrder = 50,
+        Loader = null,                       // "Fabric"/"Quilt"/"Forge"/"NeoForge" 或 null=都显示
+        CreatePanel = context => new TextBlock { Text = "任意 WPF 控件" }
+    }
+];
+```
+
+宿主把它渲染成一张 `MyCard`（标题 + 说明 + 你的控件），位置在
+「实例 → Mod 管理」页按钮区下方（`PageInstanceCompResource.PanPluginPanels`）。
+只有 `CompType.Mod` 才会渲染；`Loader` 与实例加载器不符时跳过。
+`CreatePanel` **每次刷新都会重新调用**，每次都返回新控件。
+
+> 面板里的控件没法用宿主自定义控件（`MyCard`/`MyButton`/`MySlider` 在启动器程序集里，
+> 插件引用会加载第二份宿主类型），请用标准 WPF 控件；颜色建议从
+> `Application.Current.TryFindResource("ColorBrush3")` 之类的主题资源取。
+
 ## 18. 主题扩展
 
 > 主题机制的实现细节另见 [`PLUGIN-THEMES.md`](PLUGIN-THEMES.md)。
