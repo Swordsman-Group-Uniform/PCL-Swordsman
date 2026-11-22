@@ -21,11 +21,13 @@ public static class RequestSigning
     {
         client.Version = HttpVersion.Version20;
         client.VersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
-        if (Uri.TryCreate(url, UriKind.Absolute, out var parsedUri) 
+        if (Uri.TryCreate(url, UriKind.Absolute, out var parsedUri)
             && (parsedUri.Host == "api.curseforge.com"
-            || parsedUri.Host == "edge.forgecdn.net"
-            || parsedUri.Host == "mediafilez.forgecdn.net"))
+                || parsedUri.Host == "edge.forgecdn.net"
+                || parsedUri.Host == "mediafilez.forgecdn.net")
+            && !string.IsNullOrWhiteSpace(Secrets.CurseForgeAPIKey))
         {
+            // 没有 key 就别发空的 x-api-key（官方接口照样 403，但不给解析器添乱）
             client.Headers.Add("x-api-key", Secrets.CurseForgeAPIKey);
         }
         var userAgent = !string.IsNullOrEmpty(customUserAgent)

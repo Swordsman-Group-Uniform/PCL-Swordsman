@@ -414,6 +414,13 @@ Plain Craft Launcher 2/Images/Blocks/SlimeBlock.png
 # 用户提供的成品图（Faded 主题装饰图，由使用者自行放置）
 plugins/FadedGray/Faded.jpg
 
+# 本地覆盖用的密钥文件（CurseForge API Key 等，绝不能入库）
+curseforge-api-key.txt
+/PCL/curseforge-api-key.txt
+/secrets.env
+/*.env
+/_tmp/secrets.env
+
 # 原版客户端 jar（42 MB，仅供 tools/extract-vanilla-textures.py 本地抽取，绝不入库）
 /*.jar
 

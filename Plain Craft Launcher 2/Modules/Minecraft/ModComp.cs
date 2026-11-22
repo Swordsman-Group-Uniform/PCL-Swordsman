@@ -28,6 +28,9 @@ namespace PCL;
 
 public static class ModComp
 {
+    /// <summary>「没有 CurseForge API Key」这条日志只打一次（每次搜索都会调用 GetCurseForgeAddress）。</summary>
+    private static bool _curseForgeKeyMissingLogged;
+
     public enum CompLoaderType
     {
         // https://docs.curseforge.com/?http#tocS_ModLoaderType
@@ -1988,9 +1991,15 @@ public static class ModComp
         {
             if (!source.HasFlag(CompSourceType.CurseForge))
                 return null;
-            // 构建时未注入 CurseForge API Key 时直接跳过该源（否则只会拿到 403，表现为页面加载失败）
-            if (string.IsNullOrWhiteSpace(Secrets.CurseForgeAPIKey))
-                return null;
+            // 没有内建 CurseForge API Key 时**不再跳过该源**：
+            // 官方接口会 403，但 DlModRequest 会接着试 mod.mcimirror.top 镜像（镜像自带 key），
+            // 原来这里直接 return null 就等于「CurseForge 整个源消失」，用户表现为「搜不到 CurseForge」。
+            if (string.IsNullOrWhiteSpace(Secrets.CurseForgeAPIKey) && !_curseForgeKeyMissingLogged)
+            {
+                _curseForgeKeyMissingLogged = true;
+                LogWrapper.Info("[Comp] 未注入 CurseForge API Key：官方接口会返回 403，将改走 mod.mcimirror.top 镜像");
+            }
+
             if (tag.StartsWithF("/"))
                 storage.curseForgeTotal = 0;
             if (storage.curseForgeTotal > -1 && storage.curseForgeTotal <= storage.curseForgeOffset)

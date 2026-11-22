@@ -8,6 +8,21 @@
 
 ---
 
+## 27.1.1-snapshot-90 · 修复「搜不到 CurseForge」
+
+- **根因**：本分支的构建没有注入 CurseForge API Key，`GetCurseForgeAddress()` 就整个跳过 CurseForge 源，
+  搜索页还会把「全部 / CurseForge」静默降级成仅 Modrinth —— 表现就是「模组下载搜不到 CurseForge」。
+  （有日志与实测佐证：不带 key 请求 `api.curseforge.com/v1/mods/search` 返回 `403 Forbidden: API Key missing or invalid`。）
+- **修复**：
+  1. 构建时把 CurseForge API Key 编进程序集：`build.sh` / `tools/build.ps1` 会读本地的
+     `_tmp/secrets.env` 并用源码生成器注入，**key 不会出现在源码里，也不入库**。
+  2. 去掉「没有 key 就跳过 CurseForge 源」「搜索时把源降级成 Modrinth」两处硬闸门。
+  3. 官方接口失败时照旧退回 `mod.mcimirror.top` 镜像（镜像已实测 search / mods / files / POST 全部 200），
+     所以即使内建 key 将来被吊销，CurseForge 也还能通过镜像用。
+  4. 空 key 不再发送空的 `x-api-key` 头。
+  5. 换 key 不用改代码：环境变量 `PCL_CURSEFORGE_API_KEY` 或
+     `<启动器目录>\PCL\curseforge-api-key.txt`（后者已被 `.gitignore` 排除）都能覆盖内建值。
+
 ## 27.1.1-snapshot-89 · 外置插件「高级实例管理」+ 两个新扩展点
 
 新增**外置插件**「高级实例管理」（`plugins/AdvancedInstance`，打出来是

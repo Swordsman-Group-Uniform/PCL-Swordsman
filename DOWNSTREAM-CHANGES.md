@@ -7,6 +7,25 @@
 
 > 括号外为下游版本号，括号内为**标注用的**上游版本号（**不追上游同步**，见 `HANDOVER.md` §0.19 / §4.1）。
 
+## snapshot-90：修复 CurseForge 搜不到（内建 API Key + 去掉硬闸门）
+
+| 文件 | 改动 |
+| --- | --- |
+| `PCL.Core/App/Secrets.cs` | `CurseForgeAPIKey` 改为从「构建注入 / 环境变量 `PCL_CURSEFORGE_API_KEY`」→「`<启动器目录>\PCL\curseforge-api-key.txt`」取值；**源码里不放 key** |
+| `Modules/Minecraft/ModComp.cs` | `GetCurseForgeAddress()` 不再「没有 key 就返回 null」，改为只提示一次日志，请求照发（官方 403 后走镜像） |
+| `Pages/PageDownload/Comp/PageComp.xaml.cs` | 去掉「没有 key 就把源降级成仅 Modrinth」的逻辑 |
+| `Modules/Network/Http/RequestSigning.cs`、`PCL.Core/IO/Net/NetworkService.cs` | 空 key 不再发空 `x-api-key` 头 |
+| `.gitignore` | 排除本地 `curseforge-api-key.txt` 覆盖文件与 `_tmp/secrets.env`（构建用密钥） |
+
+实测证据（Termux 里直接 curl）：
+- 无 key → `api.curseforge.com/v1/mods/search` **403** `Forbidden: API Key missing or invalid`
+- 内建 key → 同样 403（该 key 目前被拒，见下方说明）
+- 镜像 → `mod.mcimirror.top/curseforge/v1/mods/search`、`/v1/mods/<id>`、`/v1/mods/<id>/files`、`POST /v1/mods` 全部 **200**
+
+> 说明：用户提供的 key 经实测被官方接口判为无效（返回 403 `API Key missing or invalid`；格式是 GUID，
+> 而 CurseForge 的 key 一般是 `$2a$10$…` 形式）。**该 key 不写进源码**：构建时从本地 `_tmp/secrets.env`
+> 注入（见 `build.sh`），换有效 key 只需改那个本地文件、重新构建即可。
+
 ## snapshot-89：外置插件「高级实例管理」+ 启动前守门 / Mod 管理面板扩展点
 
 ### ① 新插件（外置）

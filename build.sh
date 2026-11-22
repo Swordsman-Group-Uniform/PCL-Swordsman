@@ -53,6 +53,20 @@ done
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export DOTNET_NOLOGO=1
 
+# 本地密钥（**不入库**）：如果工作区里有 _tmp/secrets.env，就把里面的变量注入构建环境。
+# 源码生成器（PCL.Core.SourceGenerators）会把 PCL_* 环境变量编译进程序集，
+# 所以密钥只存在于「本地文件 + 产物二进制」里，仓库源码中一行都没有。
+# 文件格式（每行一个）：
+#   PCL_WRITE_SECRET=1
+#   PCL_CURSEFORGE_API_KEY=<你的 key>
+if [ -f "$ROOT/_tmp/secrets.env" ]; then
+    echo "==> 已加载本地密钥文件 _tmp/secrets.env（不入库；只注入构建环境）"
+    set -a
+    # shellcheck disable=SC1091
+    . "$ROOT/_tmp/secrets.env"
+    set +a
+fi
+
 # 插件包必须先打出来：非正式版会把它们嵌进 exe（IncludeBundledPlugins=true）
 echo "==> 构建插件包"
 "$ROOT/plugins/package.sh" "$CONFIG" "$PLATFORM" || echo "!! 插件打包失败，继续构建本体" >&2

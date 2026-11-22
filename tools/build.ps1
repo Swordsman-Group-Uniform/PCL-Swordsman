@@ -76,6 +76,25 @@ Write-Host "==> 构建 PCLCE For SGU $version ($Configuration/$Platform)"
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = "1"
 $env:DOTNET_NOLOGO = "1"
 
+# 本地密钥（**不入库**）：如果工作区里有 _tmp\secrets.env，就把里面的变量注入构建环境。
+# 源码生成器会把 PCL_* 环境变量编译进程序集，所以密钥只存在于「本地文件 + 产物二进制」里，
+# 仓库源码中一行都没有。文件格式（每行一个）：
+#   PCL_WRITE_SECRET=1
+#   PCL_CURSEFORGE_API_KEY=<你的 key>
+$SecretsFile = Join-Path $Root "_tmp\secrets.env"
+if (Test-Path -LiteralPath $SecretsFile) {
+    Write-Host "==> 已加载本地密钥文件 _tmp\secrets.env（不入库；只注入构建环境）"
+    foreach ($line in Get-Content -LiteralPath $SecretsFile -Encoding UTF8) {
+        $trimmed = $line.Trim()
+        if ($trimmed.Length -eq 0 -or $trimmed.StartsWith("#")) { continue }
+        $eq = $trimmed.IndexOf("=")
+        if ($eq -le 0) { continue }
+        $name = $trimmed.Substring(0, $eq).Trim()
+        $value = $trimmed.Substring($eq + 1).Trim().Trim('"').Trim("'")
+        [Environment]::SetEnvironmentVariable($name, $value, "Process")
+    }
+}
+
 # 插件包必须先打出来：非正式版会把 plugins\dist\*.pclpkg 嵌进 exe（IncludeBundledPlugins=true）
 $PackagePs1 = Join-Path $Root "plugins\package.ps1"
 if (Test-Path -LiteralPath $PackagePs1) {

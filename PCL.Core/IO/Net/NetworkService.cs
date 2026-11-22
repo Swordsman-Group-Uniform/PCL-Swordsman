@@ -80,7 +80,9 @@ public partial class NetworkService
 
         services.AddHttpClient(CurseForgeApi).ConfigureHttpClient(c =>
         {
-            c.DefaultRequestHeaders.Add("x-api-key", Secrets.CurseForgeAPIKey);
+            // 构建时没注入 key 就不加这个头（空值没有意义，官方接口一样会 403）
+            if (!string.IsNullOrWhiteSpace(Secrets.CurseForgeAPIKey))
+                c.DefaultRequestHeaders.Add("x-api-key", Secrets.CurseForgeAPIKey);
             c.BaseAddress = new Uri(CurseForgeApiServer);
         });
         

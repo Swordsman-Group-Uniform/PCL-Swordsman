@@ -343,14 +343,9 @@ public partial class PageComp
                 ? ModBase.Val(((MyComboBoxItem)ComboSearchLoader.SelectedItem).Tag)
                 : (double)ModComp.CompLoaderType.Any);
         request.source = (ModComp.CompSourceType)ModBase.Val(((MyComboBoxItem)ComboSearchSource.SelectedItem).Tag);
-        // 未配置 CurseForge API Key 时，把「全部」或「CurseForge」源降级为仅 Modrinth
-        if (string.IsNullOrWhiteSpace(Secrets.CurseForgeAPIKey) &&
-            request.source.HasFlag(ModComp.CompSourceType.CurseForge))
-        {
-            request.source &= ~ModComp.CompSourceType.CurseForge;
-            if (!request.source.HasFlag(ModComp.CompSourceType.Modrinth))
-                request.source = ModComp.CompSourceType.Modrinth;
-        }
+        // 以前这里会在「没有内建 CurseForge API Key」时把源降级成仅 Modrinth，
+        // 结果选了 CurseForge 也什么都搜不到。现在官方接口拿不到就走 mod.mcimirror.top 镜像，
+        // 所以不再降级（镜像不可用时由 DlModRequest 的兜底与错误提示负责）。
         request.sort = (ModComp.CompSortType)ModBase.Val(((MyComboBoxItem)ComboSearchSort.SelectedItem).Tag);
         return request;
     }
